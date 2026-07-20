@@ -1,3 +1,12 @@
+.content {
+  min-width: 0;
+}
+
+.idleHint {
+  margin: 0;
+  color: #6f6f6f;
+}
+
 .results {
   display: flex;
   flex-direction: column;
@@ -7,4 +16,26 @@
 
 .summary {
   margin: 0 0 8px;
+}
+
+.pageLoading {
+  margin-bottom: 4px;
+}
+
+.state {
+  max-width: 28rem;
+  margin: 24px auto;
+  text-align: center;
+  min-width: 0;
+}
+
+.stateTitle {
+  margin: 0;
+  font-weight: 600;
+}
+
+.stateMessage {
+  margin: 0;
+  color: #545454;
+  overflow-wrap: anywhere;
 }

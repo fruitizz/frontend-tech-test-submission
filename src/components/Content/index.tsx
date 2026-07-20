@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { CharacterResult } from '../CharacterResult';
+import { Pagination } from '../Pagination';
 import { CharactersResponse, Reaction } from '../../types';
 import styles from './Content.module.scss';
 
@@ -11,6 +12,7 @@ interface ContentProps {
   isLoading: boolean;
   error: string | null;
   page: number;
+  onPageChange: (nextPage: number) => void;
 }
 
 export const Content: React.FC<ContentProps> = ({
@@ -20,6 +22,7 @@ export const Content: React.FC<ContentProps> = ({
   isLoading,
   error,
   page,
+  onPageChange,
 }) => {
   return (
     <section className="lumx-spacing-padding-huge">
@@ -37,6 +40,13 @@ export const Content: React.FC<ContentProps> = ({
               reactions={reactionsByCharacterId[character.id] ?? []}
             />
           ))}
+          <Pagination
+            hasPrevious={charactersResponse.previous !== null}
+            hasNext={charactersResponse.next !== null}
+            isLoading={isLoading}
+            onPrevious={() => onPageChange(page - 1)}
+            onNext={() => onPageChange(page + 1)}
+          />
         </div>
       )}
     </section>

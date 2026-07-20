@@ -64,20 +64,25 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  const handleSearch = async (name: string) => {
+  const requestCharacters = async (name: string, nextPage: number) => {
     const requestId = ++requestIdRef.current;
 
     setSubmittedQuery(name);
-    setPage(1);
+    setPage(nextPage);
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await getCharacters({ name, page: 1, limit: PAGE_SIZE });
+      const response = await getCharacters({
+        name,
+        page: nextPage,
+        limit: PAGE_SIZE,
+      });
       if (requestId !== requestIdRef.current) {
         return;
       }
       setCharactersResponse(response);
+      setPage(response.page);
     } catch (err) {
       if (requestId !== requestIdRef.current) {
         return;
@@ -89,6 +94,17 @@ export const App: React.FC = () => {
         setIsLoading(false);
       }
     }
+  };
+
+  const handleSearch = (name: string) => {
+    requestCharacters(name, 1);
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    if (!submittedQuery || isLoading) {
+      return;
+    }
+    requestCharacters(submittedQuery, nextPage);
   };
 
   return (
@@ -105,6 +121,7 @@ export const App: React.FC = () => {
               isLoading={isLoading}
               error={error}
               page={page}
+              onPageChange={handlePageChange}
             />
           }
         />

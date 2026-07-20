@@ -23,3 +23,6 @@ yarn-debug.log*
 yarn-error.log*
 .yarn/install-state.gz
 /.yarn/cache
+
+# build
+dist/

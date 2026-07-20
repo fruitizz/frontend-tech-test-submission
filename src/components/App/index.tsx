@@ -64,13 +64,22 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  const requestCharacters = async (name: string, nextPage: number) => {
+  const requestCharacters = async (
+    name: string,
+    nextPage: number,
+    { clearResults = false }: { clearResults?: boolean } = {},
+  ) => {
     const requestId = ++requestIdRef.current;
 
     setSubmittedQuery(name);
     setPage(nextPage);
     setIsLoading(true);
     setError(null);
+    // New searches clear prior results so the initial loading state shows.
+    // Pagination keeps the current cards visible until the next page replaces them.
+    if (clearResults) {
+      setCharactersResponse(null);
+    }
 
     try {
       const response = await getCharacters({
@@ -97,7 +106,7 @@ export const App: React.FC = () => {
   };
 
   const handleSearch = (name: string) => {
-    requestCharacters(name, 1);
+    requestCharacters(name, 1, { clearResults: true });
   };
 
   const handlePageChange = (nextPage: number) => {
@@ -105,6 +114,13 @@ export const App: React.FC = () => {
       return;
     }
     requestCharacters(submittedQuery, nextPage);
+  };
+
+  const handleRetry = () => {
+    if (!submittedQuery || isLoading) {
+      return;
+    }
+    requestCharacters(submittedQuery, page);
   };
 
   return (
@@ -122,6 +138,7 @@ export const App: React.FC = () => {
               error={error}
               page={page}
               onPageChange={handlePageChange}
+              onRetry={handleRetry}
             />
           }
         />

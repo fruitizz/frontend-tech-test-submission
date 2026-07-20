@@ -1,5 +1,18 @@
 import React from 'react';
 
+import { mdiAlertCircleOutline, mdiMagnify } from '@lumx/icons';
+import {
+  Button,
+  Emphasis,
+  FlexBox,
+  Icon,
+  Progress,
+  ProgressVariant,
+  Size,
+  Text,
+  Typography,
+} from '@lumx/react';
+
 import { CharacterResult } from '../CharacterResult';
 import { Pagination } from '../Pagination';
 import { CharactersResponse, Reaction } from '../../types';
@@ -13,6 +26,7 @@ interface ContentProps {
   error: string | null;
   page: number;
   onPageChange: (nextPage: number) => void;
+  onRetry: () => void;
 }
 
 export const Content: React.FC<ContentProps> = ({
@@ -23,17 +37,108 @@ export const Content: React.FC<ContentProps> = ({
   error,
   page,
   onPageChange,
+  onRetry,
 }) => {
+  const hasResults =
+    charactersResponse !== null && charactersResponse.results.length > 0;
+  const isEmptyResponse =
+    charactersResponse !== null && charactersResponse.results.length === 0;
+  const isInitialLoading = isLoading && !hasResults;
+  const isPageLoading = isLoading && hasResults;
+  const resultsResponse = hasResults ? charactersResponse : null;
+
   return (
-    <section className="lumx-spacing-padding-huge">
-      {isLoading && <p>Loading…</p>}
-      {error && <p role="alert">{error}</p>}
-      {!isLoading && !error && charactersResponse && (
-        <div className={styles.results}>
+    <section className={`lumx-spacing-padding-huge ${styles.content}`}>
+      {!submittedQuery && (
+        <p className={styles.idleHint}>
+          Search for a character to get started.
+        </p>
+      )}
+
+      {submittedQuery && error && !isLoading && (
+        <FlexBox
+          className={styles.state}
+          orientation="vertical"
+          hAlign="center"
+          gap={Size.regular}
+          role="alert"
+        >
+          <Icon icon={mdiAlertCircleOutline} size={Size.l} />
+          <Text as="p" typography={Typography.body1} className={styles.stateTitle}>
+            Something went wrong
+          </Text>
+          <Text as="p" typography={Typography.body2} className={styles.stateMessage}>
+            {error}
+          </Text>
+          <Button emphasis={Emphasis.high} onClick={onRetry}>
+            Retry
+          </Button>
+        </FlexBox>
+      )}
+
+      {submittedQuery && isInitialLoading && (
+        <FlexBox
+          className={styles.state}
+          orientation="vertical"
+          hAlign="center"
+          gap={Size.regular}
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <Progress variant={ProgressVariant.circular} />
+          <Text as="p" typography={Typography.body1}>
+            Searching for “{submittedQuery}”…
+          </Text>
+        </FlexBox>
+      )}
+
+      {submittedQuery && !isLoading && !error && isEmptyResponse && (
+        <FlexBox
+          className={styles.state}
+          orientation="vertical"
+          hAlign="center"
+          gap={Size.regular}
+          role="status"
+          aria-live="polite"
+        >
+          <Icon icon={mdiMagnify} size={Size.l} />
+          <Text as="p" typography={Typography.body1} className={styles.stateTitle}>
+            No results found
+          </Text>
+          <Text as="p" typography={Typography.body2} className={styles.stateMessage}>
+            No characters matched “{submittedQuery}”. Try a different search.
+          </Text>
+        </FlexBox>
+      )}
+
+      {resultsResponse && (
+        <div
+          className={styles.results}
+          aria-busy={isPageLoading}
+        >
+          {isPageLoading && (
+            <FlexBox
+              className={styles.pageLoading}
+              orientation="horizontal"
+              vAlign="center"
+              hAlign="center"
+              gap={Size.tiny}
+              role="status"
+              aria-live="polite"
+            >
+              <Progress variant={ProgressVariant.circular} />
+              <Text as="p" typography={Typography.body2}>
+                Loading…
+              </Text>
+            </FlexBox>
+          )}
+
           <p className={styles.summary}>
-            Results for “{submittedQuery}” (page {page}, total {charactersResponse.total})
+            Results for “{submittedQuery}” (page {resultsResponse.page}, total{' '}
+            {resultsResponse.total})
           </p>
-          {charactersResponse.results.map((character) => (
+          {resultsResponse.results.map((character) => (
             <CharacterResult
               key={character.id}
               character={character}
@@ -41,8 +146,8 @@ export const Content: React.FC<ContentProps> = ({
             />
           ))}
           <Pagination
-            hasPrevious={charactersResponse.previous !== null}
-            hasNext={charactersResponse.next !== null}
+            hasPrevious={resultsResponse.previous !== null}
+            hasNext={resultsResponse.next !== null}
             isLoading={isLoading}
             onPrevious={() => onPageChange(page - 1)}
             onNext={() => onPageChange(page + 1)}

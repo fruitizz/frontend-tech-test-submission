@@ -23,7 +23,7 @@ Stack in use: React, TypeScript, Vite, SCSS, Yarn, LumX (`@lumx/react`, `@lumx/c
 
 - Preserve the existing LumX Design System; build with LumX primitives and tokens already in the project.
 - Do not replace UI components unless necessary to meet the issue’s acceptance criteria.
-- Keep keyboard shortcuts working: ⌘K / Ctrl+K must continue to open the search dialog (and related focus behavior must remain intact).
+- If keyboard shortcuts are introduced or modified, preserve their existing behavior and accessibility.
 - Prioritize accessibility in every UI change; do not trade a11y for visual convenience.
 - Extend existing modules before introducing parallel structures.
 - Preserve mock API behavior (`src/__mocks`) unless the current issue explicitly requires changes.
@@ -53,7 +53,7 @@ Stack in use: React, TypeScript, Vite, SCSS, Yarn, LumX (`@lumx/react`, `@lumx/c
 - After editing: run the smallest set of checks that prove the change works.
 - Use only scripts declared in the current `package.json`, such as `yarn start` and `yarn build`. Do not invent commands or assume scripts exist.
 - Install dependencies using the repository’s existing package manager and lockfile without upgrading packages.
-- When UI or search is touched, manually confirm ⌘K / Ctrl+K still opens search.
+- When UI or search is touched, manually confirm keyboard submit and any existing shortcuts still behave as expected.
 - The documented Node.js `20.11.1` baseline currently fails with the locked Vite version, which requires Node.js `20.19+` or `22.12+`. Treat this as known pre-existing behavior until a dedicated issue changes the repository configuration.
 - Do not invent validation scripts or add test runners unless the issue requires it.
 - Report command results honestly, including failures and pre-existing breakage.
@@ -106,10 +106,10 @@ Stack in use: React, TypeScript, Vite, SCSS, Yarn, LumX (`@lumx/react`, `@lumx/c
 
 - Prioritize accessibility; treat it as a first-class acceptance concern, not a polish pass.
 - Use semantic HTML and label interactive controls (search field, pagination).
-- Preserve keyboard access for search submit and dialog/shortcut flows (including ⌘K / Ctrl+K).
+- Preserve keyboard access for search submit and for any dialog/shortcut flows that exist or are introduced.
 - Provide meaningful alternative text for character images when rendering results.
 - Do not remove focus styles or break screen-reader structure for visual tweaks.
-- Manage focus when opening/closing overlays (e.g. search dialog).
+- Manage focus when opening/closing overlays if overlays are introduced.
 
 ## Stop conditions
 

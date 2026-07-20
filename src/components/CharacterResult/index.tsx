@@ -12,17 +12,21 @@ import {
   ThumbnailObjectFit,
 } from '@lumx/react';
 
-import { Character } from '../../types';
+import { Character, Reaction } from '../../types';
 import styles from './CharacterResult.module.scss';
 
 interface CharacterResultProps {
   character: Character;
+  reactions: Reaction[];
 }
 
 const hasDisplayValue = (value: string | undefined | null): value is string =>
   typeof value === 'string' && value.trim().length > 0;
 
-export const CharacterResult: React.FC<CharacterResultProps> = ({ character }) => {
+export const CharacterResult: React.FC<CharacterResultProps> = ({
+  character,
+  reactions,
+}) => {
   const affiliations = character.affiliations.filter(hasDisplayValue);
   const imageUrl = hasDisplayValue(character.imageUrl) ? character.imageUrl : null;
 
@@ -78,6 +82,19 @@ export const CharacterResult: React.FC<CharacterResultProps> = ({ character }) =
               </Chip>
             ))}
           </div>
+        )}
+
+        {reactions.length > 0 && (
+          <ul className={styles.reactions} aria-label={`Reactions for ${character.name}`}>
+            {reactions.map((reaction, index) => (
+              <li
+                key={`${reaction.id}-${index}`}
+                className={styles.reaction}
+              >
+                <span aria-hidden="true">{reaction.content}</span>
+              </li>
+            ))}
+          </ul>
         )}
       </FlexBox>
     </article>

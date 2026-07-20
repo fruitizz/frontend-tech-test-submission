@@ -1,11 +1,12 @@
 import React from 'react';
 
 import { CharacterResult } from '../CharacterResult';
-import { CharactersResponse } from '../../types';
+import { CharactersResponse, Reaction } from '../../types';
 import styles from './Content.module.scss';
 
 interface ContentProps {
   charactersResponse: CharactersResponse | null;
+  reactionsByCharacterId: Record<number, Reaction[]>;
   submittedQuery: string;
   isLoading: boolean;
   error: string | null;
@@ -14,6 +15,7 @@ interface ContentProps {
 
 export const Content: React.FC<ContentProps> = ({
   charactersResponse,
+  reactionsByCharacterId,
   submittedQuery,
   isLoading,
   error,
@@ -29,7 +31,11 @@ export const Content: React.FC<ContentProps> = ({
             Results for “{submittedQuery}” (page {page}, total {charactersResponse.total})
           </p>
           {charactersResponse.results.map((character) => (
-            <CharacterResult key={character.id} character={character} />
+            <CharacterResult
+              key={character.id}
+              character={character}
+              reactions={reactionsByCharacterId[character.id] ?? []}
+            />
           ))}
         </div>
       )}

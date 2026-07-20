@@ -1,10 +1,12 @@
 import React from 'react';
 
+import { mdiImageBroken } from '@lumx/icons';
 import {
   AspectRatio,
   Chip,
   ColorPalette,
   FlexBox,
+  Icon,
   Size,
   Thumbnail,
   ThumbnailObjectFit,
@@ -22,17 +24,28 @@ const hasDisplayValue = (value: string | undefined | null): value is string =>
 
 export const CharacterResult: React.FC<CharacterResultProps> = ({ character }) => {
   const affiliations = character.affiliations.filter(hasDisplayValue);
+  const imageUrl = hasDisplayValue(character.imageUrl) ? character.imageUrl : null;
 
   return (
     <article className={styles.card}>
-      <Thumbnail
-        className={styles.thumbnail}
-        image={character.imageUrl ?? ''}
-        alt={character.name}
-        size={Size.xl}
-        aspectRatio={AspectRatio.square}
-        objectFit={ThumbnailObjectFit.cover}
-      />
+      {imageUrl ? (
+        <Thumbnail
+          className={styles.thumbnail}
+          image={imageUrl}
+          alt={character.name}
+          size={Size.xl}
+          aspectRatio={AspectRatio.square}
+          objectFit={ThumbnailObjectFit.cover}
+        />
+      ) : (
+        <div
+          className={`${styles.thumbnail} ${styles.thumbnailFallback}`}
+          role="img"
+          aria-label={character.name}
+        >
+          <Icon icon={mdiImageBroken} size={Size.m} />
+        </div>
+      )}
 
       <FlexBox className={styles.body} orientation="vertical">
         <div className={styles.header}>

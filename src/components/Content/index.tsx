@@ -59,6 +59,7 @@ export const Content: React.FC<ContentProps> = ({
         <FlexBox
           className={styles.state}
           orientation="vertical"
+          vAlign="center"
           hAlign="center"
           gap={Size.regular}
           role="alert"
@@ -80,6 +81,7 @@ export const Content: React.FC<ContentProps> = ({
         <FlexBox
           className={styles.state}
           orientation="vertical"
+          vAlign="center"
           hAlign="center"
           gap={Size.regular}
           role="status"
@@ -97,6 +99,7 @@ export const Content: React.FC<ContentProps> = ({
         <FlexBox
           className={styles.state}
           orientation="vertical"
+          vAlign="center"
           hAlign="center"
           gap={Size.regular}
           role="status"

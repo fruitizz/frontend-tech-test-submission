@@ -123,9 +123,23 @@ export const App: React.FC = () => {
     requestCharacters(submittedQuery, page);
   };
 
+  const handleClearSearch = () => {
+    // Invalidate any in-flight character request so a late response is ignored.
+    requestIdRef.current += 1;
+    setSubmittedQuery('');
+    setCharactersResponse(null);
+    setPage(1);
+    setError(null);
+    setIsLoading(false);
+  };
+
   return (
     <Router>
-      <Header onSearch={handleSearch} />
+      <Header
+        onSearch={handleSearch}
+        onClearSearch={handleClearSearch}
+        hasActiveSearch={Boolean(submittedQuery)}
+      />
       <Routes>
         <Route
           path="/"

@@ -26,6 +26,11 @@ const isEditableControl = (target: EventTarget | null): boolean => {
   );
 };
 
+const SEARCH_SHORTCUT_PLACEHOLDER =
+  typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform)
+    ? 'Search (⌘K)'
+    : 'Search (Ctrl+K)';
+
 export const Header: React.FC<HeaderProps> = ({
   onSearch,
   onClearSearch,
@@ -99,6 +104,7 @@ export const Header: React.FC<HeaderProps> = ({
           theme={Theme.light}
           icon={mdiMagnify}
           label="Search"
+          placeholder={SEARCH_SHORTCUT_PLACEHOLDER}
           value={draftQuery}
           onChange={setDraftQuery}
           onKeyDown={handleKeyDown}

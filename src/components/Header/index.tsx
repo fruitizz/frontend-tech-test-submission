@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { mdiCloseCircle, mdiMagnify } from '@lumx/icons';
 import { Emphasis, FlexBox, IconButton, Size, TextField, Theme, Thumbnail } from '@lumx/react';
@@ -12,12 +12,53 @@ interface HeaderProps {
   hasActiveSearch: boolean;
 }
 
+const isEditableControl = (target: EventTarget | null): boolean => {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  const tagName = target.tagName;
+  return (
+    tagName === 'INPUT' ||
+    tagName === 'TEXTAREA' ||
+    tagName === 'SELECT' ||
+    target.isContentEditable
+  );
+};
+
 export const Header: React.FC<HeaderProps> = ({
   onSearch,
   onClearSearch,
   hasActiveSearch,
 }) => {
   const [draftQuery, setDraftQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat) {
+        return;
+      }
+
+      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'k') {
+        return;
+      }
+
+      // Do not hijack typing in other editable controls.
+      // If focus is already in the search input, still prevent the browser default.
+      if (isEditableControl(event.target) && event.target !== searchInputRef.current) {
+        return;
+      }
+
+      event.preventDefault();
+      searchInputRef.current?.focus();
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown);
+    };
+  }, []);
 
   const submitSearch = () => {
     const name = draftQuery.trim();
@@ -61,6 +102,7 @@ export const Header: React.FC<HeaderProps> = ({
           value={draftQuery}
           onChange={setDraftQuery}
           onKeyDown={handleKeyDown}
+          inputRef={searchInputRef}
           clearButtonProps={hasDraft ? { label: 'Clear search' } : undefined}
           onClear={handleClear}
           afterElement={

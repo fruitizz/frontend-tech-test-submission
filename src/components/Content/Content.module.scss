@@ -1,0 +1,10 @@
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.summary {
+  margin: 0 0 8px;
+}

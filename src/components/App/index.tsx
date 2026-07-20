@@ -8,10 +8,18 @@ import {
 
 import { Header } from '../Header';
 import { Content } from '../Content';
+import { SearchModal } from '../SearchModal';
 import { getCharacters, getReactions } from '../../api';
 import { CharactersResponse, Reaction } from '../../types';
 
 const PAGE_SIZE = 4;
+
+function isCommandSearchShortcut(event: KeyboardEvent): boolean {
+  return (
+    (event.metaKey || event.ctrlKey) &&
+    event.key.toLowerCase() === 'k'
+  );
+}
 
 function groupActiveReactionsByCharacterId(
   reactions: Reaction[],
@@ -40,7 +48,11 @@ export const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const requestIdRef = useRef(0);
+  const searchModalTriggerRef = useRef<HTMLElement | null>(null);
+  const isSearchModalOpenRef = useRef(isSearchModalOpen);
+  isSearchModalOpenRef.current = isSearchModalOpen;
 
   useEffect(() => {
     let cancelled = false;
@@ -61,6 +73,36 @@ export const App: React.FC = () => {
 
     return () => {
       cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    // Global ⌘K / Ctrl+K: always activate (including while typing in inputs).
+    // Skip when the search modal is already open, and ignore key-repeat.
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!isCommandSearchShortcut(event)) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (event.repeat || isSearchModalOpenRef.current) {
+        return;
+      }
+
+      const active = document.activeElement;
+      if (active instanceof HTMLElement) {
+        searchModalTriggerRef.current = active;
+      } else {
+        searchModalTriggerRef.current = null;
+      }
+
+      setIsSearchModalOpen(true);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
     };
   }, []);
 
@@ -133,6 +175,10 @@ export const App: React.FC = () => {
     setIsLoading(false);
   };
 
+  const handleCloseSearchModal = () => {
+    setIsSearchModalOpen(false);
+  };
+
   return (
     <Router>
       <Header
@@ -157,6 +203,12 @@ export const App: React.FC = () => {
           }
         />
       </Routes>
+      <SearchModal
+        isOpen={isSearchModalOpen}
+        onClose={handleCloseSearchModal}
+        onSearch={handleSearch}
+        parentElement={searchModalTriggerRef}
+      />
     </Router>
   );
 };

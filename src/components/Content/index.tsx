@@ -24,7 +24,6 @@ interface ContentProps {
   submittedQuery: string;
   isLoading: boolean;
   error: string | null;
-  page: number;
   onPageChange: (nextPage: number) => void;
   onRetry: () => void;
 }
@@ -35,7 +34,6 @@ export const Content: React.FC<ContentProps> = ({
   submittedQuery,
   isLoading,
   error,
-  page,
   onPageChange,
   onRetry,
 }) => {
@@ -149,11 +147,11 @@ export const Content: React.FC<ContentProps> = ({
             />
           ))}
           <Pagination
-            hasPrevious={resultsResponse.previous !== null}
-            hasNext={resultsResponse.next !== null}
+            page={resultsResponse.page}
+            total={resultsResponse.total}
+            limit={resultsResponse.limit}
             isLoading={isLoading}
-            onPrevious={() => onPageChange(page - 1)}
-            onNext={() => onPageChange(page + 1)}
+            onPageChange={onPageChange}
           />
         </div>
       )}

@@ -1,11 +1,8 @@
-$primary-color: #20232a;
-$text-color: white;
-
 .header {
-  padding: 10px 20px;
-  background-color: #f8f8f8; // Light gray background
-  border-bottom: 1px solid #ddd;
-  min-height: 50px; // Ensure a standard height
+  padding: var(--lumx-spacing-unit-regular) var(--lumx-spacing-unit-big);
+  background-color: var(--lumx-color-dark-L6);
+  border-bottom: 1px solid var(--lumx-color-dark-L4);
+  min-height: var(--lumx-size-l);
 
   .logo img {
     height: 100px;
@@ -17,4 +14,3 @@ $text-color: white;
     max-width: 320px;
   }
 }
-

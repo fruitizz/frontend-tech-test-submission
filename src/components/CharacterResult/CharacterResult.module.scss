@@ -1,11 +1,11 @@
 .card {
   display: flex;
   flex-direction: row;
-  gap: 24px;
-  padding: 20px;
-  background-color: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  gap: var(--lumx-spacing-unit-huge);
+  padding: var(--lumx-spacing-unit-big) var(--lumx-spacing-unit-huge);
+  background-color: var(--lumx-color-light-N);
+  border: 1px solid var(--lumx-color-dark-L4);
+  border-radius: calc(var(--lumx-border-radius) * 2);
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
@@ -19,19 +19,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 128px;
-  height: 128px;
+  width: var(--lumx-size-xl);
+  height: var(--lumx-size-xl);
   box-sizing: border-box;
-  background-color: #f0f0f0;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  color: #9b9b9b;
+  background-color: var(--lumx-color-dark-L6);
+  border: 1px solid var(--lumx-color-dark-L4);
+  border-radius: var(--lumx-border-radius);
 }
 
 .body {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
   min-width: 0;
   flex: 1;
 }
@@ -40,41 +36,36 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: var(--lumx-spacing-unit-regular);
   min-width: 0;
 }
 
 .name {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.3;
   overflow-wrap: anywhere;
 }
 
 .meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--lumx-spacing-unit-regular);
 }
 
 .description {
   margin: 0;
-  color: #545454;
-  line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
 .affiliations {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--lumx-spacing-unit-regular);
 }
 
 .reactions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--lumx-spacing-unit-regular);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -84,14 +75,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: var(--lumx-size-m);
+  height: var(--lumx-size-m);
   box-sizing: border-box;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--lumx-color-dark-L4);
   border-radius: 50%;
-  background-color: #f7f7f7;
-  font-size: 1rem;
-  line-height: 1;
+  background-color: var(--lumx-color-dark-L6);
 }
 
 @media (max-width: 640px) {

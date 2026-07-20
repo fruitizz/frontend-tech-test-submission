@@ -4,27 +4,26 @@
 
 .idleHint {
   margin: 0;
-  color: #6f6f6f;
 }
 
 .results {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--lumx-spacing-unit-big);
   min-width: 0;
 }
 
 .summary {
-  margin: 0 0 8px;
+  margin: 0 0 var(--lumx-spacing-unit-regular);
 }
 
 .pageLoading {
-  margin-bottom: 4px;
+  margin-bottom: var(--lumx-spacing-unit-tiny);
 }
 
 .state {
   max-width: 28rem;
-  margin: 24px auto;
+  margin: var(--lumx-spacing-unit-huge) auto;
   text-align: center;
   min-width: 0;
   align-items: center;
@@ -32,11 +31,9 @@
 
 .stateTitle {
   margin: 0;
-  font-weight: 600;
 }
 
 .stateMessage {
   margin: 0;
-  color: #545454;
   overflow-wrap: anywhere;
 }

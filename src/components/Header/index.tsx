@@ -89,7 +89,10 @@ export const Header: React.FC<HeaderProps> = ({
       event.preventDefault();
       if (draftQuery.length > 0 || hasActiveSearch) {
         handleClear();
+        return;
       }
+      // Nothing to clear: remove focus from the search input.
+      searchInputRef.current?.blur();
     }
   };
 

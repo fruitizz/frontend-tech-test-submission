@@ -82,6 +82,17 @@ export const Header: React.FC<HeaderProps> = ({
     if (event.key === 'Enter') {
       event.preventDefault();
       submitSearch();
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      if (draftQuery.length > 0 || hasActiveSearch) {
+        handleClear();
+        return;
+      }
+      // Nothing to clear: remove focus from the search input.
+      searchInputRef.current?.blur();
     }
   };
 

@@ -34,7 +34,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           emphasis={Emphasis.medium}
           size={Size.m}
           leftIcon={mdiChevronLeft}
-          disabled={isLoading || !hasPrevious}
+          isDisabled={isLoading || !hasPrevious}
           onClick={onPrevious}
         >
           Previous
@@ -43,7 +43,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           emphasis={Emphasis.medium}
           size={Size.m}
           rightIcon={mdiChevronRight}
-          disabled={isLoading || !hasNext}
+          isDisabled={isLoading || !hasNext}
           onClick={onNext}
         >
           Next

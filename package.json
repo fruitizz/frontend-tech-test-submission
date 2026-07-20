@@ -25,6 +25,7 @@
     "yarn": ">= 3.4.1"
   },
   "devDependencies": {
+    "@hanfani/guard": "0.2.1",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "^5.0.4",

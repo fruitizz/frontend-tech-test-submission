@@ -3,6 +3,8 @@ import React from 'react';
 import { mdiAlertCircleOutline, mdiMagnify } from '@lumx/icons';
 import {
   Button,
+  ColorPalette,
+  ColorVariant,
   Emphasis,
   FlexBox,
   Icon,
@@ -24,7 +26,6 @@ interface ContentProps {
   submittedQuery: string;
   isLoading: boolean;
   error: string | null;
-  page: number;
   onPageChange: (nextPage: number) => void;
   onRetry: () => void;
 }
@@ -35,7 +36,6 @@ export const Content: React.FC<ContentProps> = ({
   submittedQuery,
   isLoading,
   error,
-  page,
   onPageChange,
   onRetry,
 }) => {
@@ -50,9 +50,15 @@ export const Content: React.FC<ContentProps> = ({
   return (
     <section className={`lumx-spacing-padding-huge ${styles.content}`}>
       {!submittedQuery && (
-        <p className={styles.idleHint}>
+        <Text
+          as="p"
+          typography={Typography.body1}
+          color={ColorPalette.dark}
+          colorVariant={ColorVariant.L2}
+          className={styles.idleHint}
+        >
           Search for a character to get started.
-        </p>
+        </Text>
       )}
 
       {submittedQuery && error && !isLoading && (
@@ -64,11 +70,28 @@ export const Content: React.FC<ContentProps> = ({
           gap={Size.regular}
           role="alert"
         >
-          <Icon icon={mdiAlertCircleOutline} size={Size.l} />
-          <Text as="p" typography={Typography.body1} className={styles.stateTitle}>
+          <Icon
+            icon={mdiAlertCircleOutline}
+            size={Size.l}
+            color={ColorPalette.dark}
+            colorVariant={ColorVariant.L2}
+          />
+          <Text
+            as="p"
+            typography={Typography.subtitle2}
+            color={ColorPalette.dark}
+            colorVariant={ColorVariant.N}
+            className={styles.stateTitle}
+          >
             Something went wrong
           </Text>
-          <Text as="p" typography={Typography.body2} className={styles.stateMessage}>
+          <Text
+            as="p"
+            typography={Typography.body1}
+            color={ColorPalette.dark}
+            colorVariant={ColorVariant.L1}
+            className={styles.stateMessage}
+          >
             {error}
           </Text>
           <Button emphasis={Emphasis.high} onClick={onRetry}>
@@ -89,7 +112,12 @@ export const Content: React.FC<ContentProps> = ({
           aria-busy="true"
         >
           <Progress variant={ProgressVariant.circular} />
-          <Text as="p" typography={Typography.body1}>
+          <Text
+            as="p"
+            typography={Typography.body1}
+            color={ColorPalette.dark}
+            colorVariant={ColorVariant.N}
+          >
             Searching for “{submittedQuery}”…
           </Text>
         </FlexBox>
@@ -105,11 +133,28 @@ export const Content: React.FC<ContentProps> = ({
           role="status"
           aria-live="polite"
         >
-          <Icon icon={mdiMagnify} size={Size.l} />
-          <Text as="p" typography={Typography.body1} className={styles.stateTitle}>
+          <Icon
+            icon={mdiMagnify}
+            size={Size.l}
+            color={ColorPalette.dark}
+            colorVariant={ColorVariant.L2}
+          />
+          <Text
+            as="p"
+            typography={Typography.subtitle2}
+            color={ColorPalette.dark}
+            colorVariant={ColorVariant.N}
+            className={styles.stateTitle}
+          >
             No results found
           </Text>
-          <Text as="p" typography={Typography.body2} className={styles.stateMessage}>
+          <Text
+            as="p"
+            typography={Typography.body1}
+            color={ColorPalette.dark}
+            colorVariant={ColorVariant.L1}
+            className={styles.stateMessage}
+          >
             No characters matched “{submittedQuery}”. Try a different search.
           </Text>
         </FlexBox>
@@ -131,16 +176,27 @@ export const Content: React.FC<ContentProps> = ({
               aria-live="polite"
             >
               <Progress variant={ProgressVariant.circular} />
-              <Text as="p" typography={Typography.body2}>
+              <Text
+                as="p"
+                typography={Typography.body2}
+                color={ColorPalette.dark}
+                colorVariant={ColorVariant.L1}
+              >
                 Loading…
               </Text>
             </FlexBox>
           )}
 
-          <p className={styles.summary}>
+          <Text
+            as="p"
+            typography={Typography.body2}
+            color={ColorPalette.dark}
+            colorVariant={ColorVariant.L1}
+            className={styles.summary}
+          >
             Results for “{submittedQuery}” (page {resultsResponse.page}, total{' '}
             {resultsResponse.total})
-          </p>
+          </Text>
           {resultsResponse.results.map((character) => (
             <CharacterResult
               key={character.id}
@@ -149,11 +205,11 @@ export const Content: React.FC<ContentProps> = ({
             />
           ))}
           <Pagination
-            hasPrevious={resultsResponse.previous !== null}
-            hasNext={resultsResponse.next !== null}
+            page={resultsResponse.page}
+            total={resultsResponse.total}
+            limit={resultsResponse.limit}
             isLoading={isLoading}
-            onPrevious={() => onPageChange(page - 1)}
-            onNext={() => onPageChange(page + 1)}
+            onPageChange={onPageChange}
           />
         </div>
       )}

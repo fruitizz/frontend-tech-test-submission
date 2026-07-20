@@ -150,7 +150,6 @@ export const App: React.FC = () => {
               submittedQuery={submittedQuery}
               isLoading={isLoading}
               error={error}
-              page={page}
               onPageChange={handlePageChange}
               onRetry={handleRetry}
             />

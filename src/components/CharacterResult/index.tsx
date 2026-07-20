@@ -5,11 +5,14 @@ import {
   AspectRatio,
   Chip,
   ColorPalette,
+  ColorVariant,
   FlexBox,
   Icon,
   Size,
+  Text,
   Thumbnail,
   ThumbnailObjectFit,
+  Typography,
 } from '@lumx/react';
 
 import { Character, Reaction } from '../../types';
@@ -47,13 +50,26 @@ export const CharacterResult: React.FC<CharacterResultProps> = ({
           role="img"
           aria-label={character.name}
         >
-          <Icon icon={mdiImageBroken} size={Size.m} />
+          <Icon
+            icon={mdiImageBroken}
+            size={Size.m}
+            color={ColorPalette.dark}
+            colorVariant={ColorVariant.L3}
+          />
         </div>
       )}
 
-      <FlexBox className={styles.body} orientation="vertical">
+      <FlexBox className={styles.body} orientation="vertical" gap={Size.medium}>
         <div className={styles.header}>
-          <h2 className={styles.name}>{character.name}</h2>
+          <Text
+            as="h2"
+            typography={Typography.title}
+            color={ColorPalette.dark}
+            colorVariant={ColorVariant.N}
+            className={styles.name}
+          >
+            {character.name}
+          </Text>
           {(hasDisplayValue(character.species) || hasDisplayValue(character.birthYear)) && (
             <div className={styles.meta}>
               {hasDisplayValue(character.species) && (
@@ -71,7 +87,15 @@ export const CharacterResult: React.FC<CharacterResultProps> = ({
         </div>
 
         {hasDisplayValue(character.description) && (
-          <p className={styles.description}>{character.description}</p>
+          <Text
+            as="p"
+            typography={Typography.body1}
+            color={ColorPalette.dark}
+            colorVariant={ColorVariant.L1}
+            className={styles.description}
+          >
+            {character.description}
+          </Text>
         )}
 
         {affiliations.length > 0 && (
@@ -91,7 +115,9 @@ export const CharacterResult: React.FC<CharacterResultProps> = ({
                 key={`${reaction.id}-${index}`}
                 className={styles.reaction}
               >
-                <span aria-hidden="true">{reaction.content}</span>
+                <Text as="span" typography={Typography.body1} aria-hidden="true">
+                  {reaction.content}
+                </Text>
               </li>
             ))}
           </ul>

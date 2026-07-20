@@ -1,9 +1,26 @@
 .pagination {
-  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  margin-top: var(--lumx-spacing-unit-huge);
   min-width: 0;
 }
 
 .controls {
   width: 100%;
   min-width: 0;
+}
+
+// Keep page controls square using LumX size tokens (colors/typography come from Button/IconButton/Text).
+.control {
+  min-width: var(--lumx-size-m);
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--lumx-spacing-unit-huge);
+  user-select: none;
 }

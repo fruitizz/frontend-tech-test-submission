@@ -10,5 +10,11 @@ $text-color: white;
   .logo img {
     height: 100px;
   }
+
+  .search {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 320px;
+  }
 }
 

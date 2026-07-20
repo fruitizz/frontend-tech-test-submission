@@ -1,7 +1,17 @@
 import React from 'react';
 
 import { mdiChevronLeft, mdiChevronRight } from '@lumx/icons';
-import { Icon, Size } from '@lumx/react';
+import {
+  Button,
+  ColorPalette,
+  ColorVariant,
+  Emphasis,
+  FlexBox,
+  IconButton,
+  Size,
+  Text,
+  Typography,
+} from '@lumx/react';
 
 import styles from './Pagination.module.scss';
 
@@ -69,55 +79,66 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <nav className={styles.pagination} aria-label="Search results pagination">
-      <div className={styles.controls}>
-        <button
-          type="button"
+      <FlexBox
+        className={styles.controls}
+        orientation="horizontal"
+        vAlign="center"
+        hAlign="center"
+        gap={Size.regular}
+        wrap
+      >
+        <IconButton
           className={styles.control}
-          aria-label="Previous page"
-          disabled={isLoading || !hasPrevious}
+          label="Previous page"
+          icon={mdiChevronLeft}
+          emphasis={Emphasis.medium}
+          size={Size.m}
+          hideTooltip
+          isDisabled={isLoading || !hasPrevious}
           onClick={() => onPageChange(page - 1)}
-        >
-          <Icon icon={mdiChevronLeft} size={Size.xs} />
-        </button>
+        />
 
         {pageItems.map((item, index) =>
           item === 'ellipsis' ? (
-            <span
+            <Text
               key={`ellipsis-${index}`}
+              as="span"
               className={styles.ellipsis}
+              typography={Typography.body1}
+              color={ColorPalette.dark}
+              colorVariant={ColorVariant.L2}
               aria-hidden="true"
             >
               …
-            </span>
+            </Text>
           ) : (
-            <button
+            <Button
               key={item}
-              type="button"
-              className={
-                item === page
-                  ? `${styles.control} ${styles.controlActive}`
-                  : styles.control
-              }
+              className={styles.control}
+              emphasis={Emphasis.medium}
+              size={Size.m}
+              isSelected={item === page}
+              isDisabled={isLoading}
               aria-label={`Page ${item}`}
               aria-current={item === page ? 'page' : undefined}
-              disabled={isLoading || item === page}
               onClick={() => onPageChange(item)}
             >
               {item}
-            </button>
+            </Button>
           ),
         )}
 
-        <button
-          type="button"
+        <IconButton
           className={styles.control}
-          aria-label="Next page"
-          disabled={isLoading || !hasNext}
+          label="Next page"
+          icon={mdiChevronRight}
+          emphasis={Emphasis.medium}
+          size={Size.m}
+          hideTooltip
+          isDisabled={isLoading || !hasNext}
           onClick={() => onPageChange(page + 1)}
-        >
-          <Icon icon={mdiChevronRight} size={Size.xs} />
-        </button>
-      </div>
+        />
+      </FlexBox>
     </nav>
   );
 };

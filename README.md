@@ -1,9 +1,5 @@
 # LumApps Frontend Test
 
-[![CI](https://github.com/fruitizz/frontend-tech-test-submission/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/fruitizz/frontend-tech-test-submission/actions/workflows/ci.yml)
-[![Playwright](https://img.shields.io/badge/tested_with-Playwright-45ba4b?logo=playwright&logoColor=white)](https://playwright.dev)
-[![Coverage](https://img.shields.io/badge/coverage-85%25%2F80%25%2F75%25-brightgreen)](https://github.com/fruitizz/frontend-tech-test-submission/actions/workflows/ci.yml)
-
 ## Introduction
 
 Welcome to the LumApps Frontend Technical Test. In this test, the candidate will need to create a small frontend application using the technologies that we at LumApps use in our daily routine.
@@ -86,40 +82,6 @@ This will setup the necessary dependencies to execute this project.
 The candidate will need to use Node JS v.20.11.1 in order to run this project. Not doing so will result in an error. The candidate can install this particular version using [nvm](https://github.com/nvm-sh/nvm).
 
 To start development, the candidate can execute `yarn start`, which will run the app in development mode.
-
-### Unit tests and coverage
-
-Vitest unit tests cover shared API and utility modules. Coverage for those paths must meet:
-
-| Metric | Threshold |
-| --- | --- |
-| Statements | 85% |
-| Lines | 85% |
-| Functions | 80% |
-| Branches | 75% |
-
-```bash
-yarn test
-yarn test:coverage
-```
-
-HTML coverage output is written to `coverage/`. CI runs `yarn test:coverage` on every pull request and push to `master`.
-
-### End-to-end tests
-
-Browser workflow tests use [Playwright](https://playwright.dev) and run in GitHub Actions on pull requests and pushes to `master`.
-
-```bash
-yarn test:e2e
-```
-
-After a local run, open the HTML report with:
-
-```bash
-yarn playwright show-report
-```
-
-On CI, download the `playwright-report` artifact from the failed (or completed) workflow run, extract it, then run `yarn playwright show-report <extracted-folder>`.
 
 ## Project delivery
 

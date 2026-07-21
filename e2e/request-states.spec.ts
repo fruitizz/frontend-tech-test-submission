@@ -113,7 +113,7 @@ test.describe('request states', () => {
     await gotoApp(page);
     await submitSearch(page, 'nobody');
 
-    await expect(page.getByText('No results found')).toBeVisible();
+    await expect(page.getByText('No results matched your search.')).toBeVisible();
     await expect(page.getByText('Something went wrong')).toHaveCount(0);
   });
 });

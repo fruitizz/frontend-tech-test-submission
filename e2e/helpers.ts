@@ -119,6 +119,6 @@ export async function expectIdleState(page: Page) {
     page.getByText('Search for a character to get started.'),
   ).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Search results pagination' })).toHaveCount(0);
-  await expect(page.getByText('No results found')).toHaveCount(0);
+  await expect(page.getByText('No results matched your search.')).toHaveCount(0);
   await expect(page.getByText('Something went wrong')).toHaveCount(0);
 }

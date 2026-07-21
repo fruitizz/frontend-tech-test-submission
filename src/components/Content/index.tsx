@@ -30,6 +30,62 @@ interface ContentProps {
   onRetry: () => void;
 }
 
+interface ContentStatusProps {
+  icon: string;
+  title: string;
+  description?: string;
+  role?: React.AriaRole;
+  'aria-live'?: 'off' | 'polite' | 'assertive';
+  children?: React.ReactNode;
+}
+
+const ContentStatus: React.FC<ContentStatusProps> = ({
+  icon,
+  title,
+  description,
+  role = 'status',
+  'aria-live': ariaLive,
+  children,
+}) => (
+  <FlexBox
+    className={styles.state}
+    orientation="vertical"
+    vAlign="center"
+    hAlign="center"
+    gap={Size.regular}
+    role={role}
+    aria-live={ariaLive}
+  >
+    <Icon
+      icon={icon}
+      size={Size.l}
+      color={ColorPalette.dark}
+      colorVariant={ColorVariant.L2}
+    />
+    <Text
+      as="p"
+      typography={Typography.custom.title3}
+      color={ColorPalette.dark}
+      colorVariant={ColorVariant.N}
+      className={styles.stateTitle}
+    >
+      {title}
+    </Text>
+    {description ? (
+      <Text
+        as="p"
+        typography={Typography.body1}
+        color={ColorPalette.dark}
+        colorVariant={ColorVariant.L1}
+        className={styles.stateMessage}
+      >
+        {description}
+      </Text>
+    ) : null}
+    {children}
+  </FlexBox>
+);
+
 export const Content: React.FC<ContentProps> = ({
   charactersResponse,
   reactionsByCharacterId,
@@ -50,54 +106,24 @@ export const Content: React.FC<ContentProps> = ({
   return (
     <section className={`lumx-spacing-padding-huge ${styles.content}`}>
       {!submittedQuery && (
-        <Text
-          as="p"
-          typography={Typography.body1}
-          color={ColorPalette.dark}
-          colorVariant={ColorVariant.L2}
-          className={styles.idleHint}
-        >
-          Search for a character to get started.
-        </Text>
+        <ContentStatus
+          icon={mdiMagnify}
+          title="Search for a character to get started."
+          aria-live="polite"
+        />
       )}
 
       {submittedQuery && error && !isLoading && (
-        <FlexBox
-          className={styles.state}
-          orientation="vertical"
-          vAlign="center"
-          hAlign="center"
-          gap={Size.regular}
+        <ContentStatus
+          icon={mdiAlertCircleOutline}
+          title="Something went wrong"
+          description={error}
           role="alert"
         >
-          <Icon
-            icon={mdiAlertCircleOutline}
-            size={Size.l}
-            color={ColorPalette.dark}
-            colorVariant={ColorVariant.L2}
-          />
-          <Text
-            as="p"
-            typography={Typography.subtitle2}
-            color={ColorPalette.dark}
-            colorVariant={ColorVariant.N}
-            className={styles.stateTitle}
-          >
-            Something went wrong
-          </Text>
-          <Text
-            as="p"
-            typography={Typography.body1}
-            color={ColorPalette.dark}
-            colorVariant={ColorVariant.L1}
-            className={styles.stateMessage}
-          >
-            {error}
-          </Text>
           <Button emphasis={Emphasis.high} onClick={onRetry}>
             Retry
           </Button>
-        </FlexBox>
+        </ContentStatus>
       )}
 
       {submittedQuery && isInitialLoading && (
@@ -124,40 +150,12 @@ export const Content: React.FC<ContentProps> = ({
       )}
 
       {submittedQuery && !isLoading && !error && isEmptyResponse && (
-        <FlexBox
-          className={styles.state}
-          orientation="vertical"
-          vAlign="center"
-          hAlign="center"
-          gap={Size.regular}
-          role="status"
+        <ContentStatus
+          icon={mdiMagnify}
+          title="No results matched your search."
+          description={`No characters matched “${submittedQuery}”. Try a different search.`}
           aria-live="polite"
-        >
-          <Icon
-            icon={mdiMagnify}
-            size={Size.l}
-            color={ColorPalette.dark}
-            colorVariant={ColorVariant.L2}
-          />
-          <Text
-            as="p"
-            typography={Typography.subtitle2}
-            color={ColorPalette.dark}
-            colorVariant={ColorVariant.N}
-            className={styles.stateTitle}
-          >
-            No results found
-          </Text>
-          <Text
-            as="p"
-            typography={Typography.body1}
-            color={ColorPalette.dark}
-            colorVariant={ColorVariant.L1}
-            className={styles.stateMessage}
-          >
-            No characters matched “{submittedQuery}”. Try a different search.
-          </Text>
-        </FlexBox>
+        />
       )}
 
       {resultsResponse && (

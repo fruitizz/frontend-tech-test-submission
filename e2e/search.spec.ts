@@ -61,7 +61,7 @@ test.describe('search workflow', () => {
 
     await submitSearch(page, 'zzzzz');
 
-    await expect(page.getByText('No results found')).toBeVisible();
+    await expect(page.getByText('No results matched your search.')).toBeVisible();
     await expect(page.getByText('Something went wrong')).toHaveCount(0);
     await expect(searchInput(page)).toBeEnabled();
   });

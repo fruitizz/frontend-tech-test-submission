@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/fruitizz/frontend-tech-test-submission/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/fruitizz/frontend-tech-test-submission/actions/workflows/ci.yml)
 [![Playwright](https://img.shields.io/badge/tested_with-Playwright-45ba4b?logo=playwright&logoColor=white)](https://playwright.dev)
-[![Coverage](https://img.shields.io/badge/coverage-%3E50%25-brightgreen)](https://github.com/fruitizz/frontend-tech-test-submission/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-85%25%2F80%25%2F75%25-brightgreen)](https://github.com/fruitizz/frontend-tech-test-submission/actions/workflows/ci.yml)
 
 ## Introduction
 
@@ -89,7 +89,14 @@ To start development, the candidate can execute `yarn start`, which will run the
 
 ### Unit tests and coverage
 
-Vitest unit tests cover shared API and utility modules. Coverage must stay above 50% (statements, branches, functions, and lines) for those paths:
+Vitest unit tests cover shared API and utility modules. Coverage for those paths must meet:
+
+| Metric | Threshold |
+| --- | --- |
+| Statements | 85% |
+| Lines | 85% |
+| Functions | 80% |
+| Branches | 75% |
 
 ```bash
 yarn test

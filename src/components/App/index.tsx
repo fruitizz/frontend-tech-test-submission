@@ -9,27 +9,10 @@ import {
 import { Header } from '../Header';
 import { Content } from '../Content';
 import { getCharacters, getReactions } from '../../api';
-import { CharactersResponse, Reaction } from '../../types';
+import { CharactersResponse } from '../../types';
+import { groupActiveReactionsByCharacterId } from '../../utils/reactions';
 
 const PAGE_SIZE = 4;
-
-function groupActiveReactionsByCharacterId(
-  reactions: Reaction[],
-): Record<number, Reaction[]> {
-  const byCharacterId: Record<number, Reaction[]> = {};
-
-  for (const reaction of reactions) {
-    if (reaction.deleted) {
-      continue;
-    }
-
-    const list = byCharacterId[reaction.characterId] ?? [];
-    list.push(reaction);
-    byCharacterId[reaction.characterId] = list;
-  }
-
-  return byCharacterId;
-}
 
 export const App: React.FC = () => {
   const [charactersResponse, setCharactersResponse] = useState<CharactersResponse | null>(null);

@@ -3,7 +3,6 @@ import React from 'react';
 import { mdiImageBroken } from '@lumx/icons';
 import {
   AspectRatio,
-  Chip,
   ColorPalette,
   ColorVariant,
   FlexBox,
@@ -15,16 +14,15 @@ import {
   Typography,
 } from '@lumx/react';
 
+import { hasDisplayValue } from '../../utils/display';
 import { Character, Reaction } from '../../types';
+import { StaticChip } from './StaticChip';
 import styles from './CharacterResult.module.scss';
 
 interface CharacterResultProps {
   character: Character;
   reactions: Reaction[];
 }
-
-const hasDisplayValue = (value: string | undefined | null): value is string =>
-  typeof value === 'string' && value.trim().length > 0;
 
 export const CharacterResult: React.FC<CharacterResultProps> = ({
   character,
@@ -39,7 +37,7 @@ export const CharacterResult: React.FC<CharacterResultProps> = ({
         <Thumbnail
           className={styles.thumbnail}
           image={imageUrl}
-          alt={character.name}
+          alt=""
           size={Size.xl}
           aspectRatio={AspectRatio.square}
           objectFit={ThumbnailObjectFit.cover}
@@ -47,8 +45,7 @@ export const CharacterResult: React.FC<CharacterResultProps> = ({
       ) : (
         <div
           className={`${styles.thumbnail} ${styles.thumbnailFallback}`}
-          role="img"
-          aria-label={character.name}
+          aria-hidden="true"
         >
           <Icon
             icon={mdiImageBroken}
@@ -71,18 +68,18 @@ export const CharacterResult: React.FC<CharacterResultProps> = ({
             {character.name}
           </Text>
           {(hasDisplayValue(character.species) || hasDisplayValue(character.birthYear)) && (
-            <div className={styles.meta}>
+            <ul className={styles.meta} aria-label="Character details">
               {hasDisplayValue(character.species) && (
-                <Chip size={Size.s} color={ColorPalette.blue}>
-                  {character.species}
-                </Chip>
+                <li className={styles.metaItem}>
+                  <StaticChip color={ColorPalette.blue}>{character.species}</StaticChip>
+                </li>
               )}
               {hasDisplayValue(character.birthYear) && (
-                <Chip size={Size.s} color={ColorPalette.green}>
-                  {character.birthYear}
-                </Chip>
+                <li className={styles.metaItem}>
+                  <StaticChip color={ColorPalette.green}>{character.birthYear}</StaticChip>
+                </li>
               )}
-            </div>
+            </ul>
           )}
         </div>
 
@@ -99,13 +96,13 @@ export const CharacterResult: React.FC<CharacterResultProps> = ({
         )}
 
         {affiliations.length > 0 && (
-          <div className={styles.affiliations}>
+          <ul className={styles.affiliations} aria-label="Affiliations">
             {affiliations.map((affiliation) => (
-              <Chip key={affiliation} size={Size.s} color={ColorPalette.yellow}>
-                {affiliation}
-              </Chip>
+              <li key={affiliation} className={styles.affiliationItem}>
+                <StaticChip color={ColorPalette.yellow}>{affiliation}</StaticChip>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
 
         {reactions.length > 0 && (
@@ -115,7 +112,7 @@ export const CharacterResult: React.FC<CharacterResultProps> = ({
                 key={`${reaction.id}-${index}`}
                 className={styles.reaction}
               >
-                <Text as="span" typography={Typography.body1} aria-hidden="true">
+                <Text as="span" typography={Typography.body1}>
                   {reaction.content}
                 </Text>
               </li>

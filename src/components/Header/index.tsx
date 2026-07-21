@@ -5,6 +5,7 @@ import { Emphasis, FlexBox, IconButton, Size, TextField, Theme, Thumbnail } from
 
 import styles from './Header.module.scss';
 import logo from '../../assets/logo.png';
+import { normalizeSearchQuery } from '../../utils/search';
 
 interface HeaderProps {
   onSearch: (name: string) => void;
@@ -66,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   const submitSearch = () => {
-    const name = draftQuery.trim();
+    const name = normalizeSearchQuery(draftQuery);
     if (!name) {
       return;
     }
@@ -79,12 +80,6 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      submitSearch();
-      return;
-    }
-
     if (event.key === 'Escape') {
       event.preventDefault();
       if (draftQuery.length > 0 || hasActiveSearch) {
@@ -96,6 +91,11 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    submitSearch();
+  };
+
   const hasDraft = draftQuery.length > 0;
   // TextField's built-in clear only renders when the value is non-empty.
   // Keep a focusable clear control when a submitted search is still active.
@@ -103,6 +103,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className={styles.header}>
+      <h1 className={styles.visuallyHidden}>Star Wars character search</h1>
       <FlexBox className={styles.logo} orientation="horizontal" vAlign="space-between" hAlign="center">
         <Thumbnail
           image={logo}
@@ -110,32 +111,39 @@ export const Header: React.FC<HeaderProps> = ({
           alt="My Static App Logo"
         />
 
-        <TextField
-          className={styles.search}
-          theme={Theme.light}
-          icon={mdiMagnify}
-          label="Search"
-          placeholder={SEARCH_SHORTCUT_PLACEHOLDER}
-          value={draftQuery}
-          onChange={setDraftQuery}
-          onKeyDown={handleKeyDown}
-          inputRef={searchInputRef}
-          clearButtonProps={hasDraft ? { label: 'Clear search' } : undefined}
-          onClear={handleClear}
-          afterElement={
-            showActiveSearchClear ? (
-              <IconButton
-                label="Clear search"
-                icon={mdiCloseCircle}
-                emphasis={Emphasis.low}
-                size={Size.s}
-                theme={Theme.light}
-                type="button"
-                onClick={handleClear}
-              />
-            ) : undefined
-          }
-        />
+        <form
+          className={styles.searchForm}
+          role="search"
+          onSubmit={handleSubmit}
+        >
+          <TextField
+            className={styles.search}
+            theme={Theme.light}
+            icon={mdiMagnify}
+            label="Search"
+            type="search"
+            placeholder={SEARCH_SHORTCUT_PLACEHOLDER}
+            value={draftQuery}
+            onChange={setDraftQuery}
+            onKeyDown={handleKeyDown}
+            inputRef={searchInputRef}
+            clearButtonProps={hasDraft ? { label: 'Clear search' } : undefined}
+            onClear={handleClear}
+            afterElement={
+              showActiveSearchClear ? (
+                <IconButton
+                  label="Clear search"
+                  icon={mdiCloseCircle}
+                  emphasis={Emphasis.low}
+                  size={Size.s}
+                  theme={Theme.light}
+                  type="button"
+                  onClick={handleClear}
+                />
+              ) : undefined
+            }
+          />
+        </form>
       </FlexBox>
     </header>
   );

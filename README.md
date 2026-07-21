@@ -4,6 +4,32 @@
 [![Playwright](https://img.shields.io/badge/tested_with-Playwright-45ba4b?logo=playwright&logoColor=white)](https://playwright.dev)
 [![Coverage](https://img.shields.io/badge/coverage-85%25%2F80%25%2F75%25-brightgreen)](https://github.com/fruitizz/frontend-tech-test-submission/actions/workflows/ci.yml)
 
+## Reviewer Guide
+
+For anyone doing a time-boxed review of this submission:
+
+- **Live app:** [frontend-tech-test-submission.vercel.app](https://frontend-tech-test-submission.vercel.app)
+- **Architecture:** [docs/architecture.md](docs/architecture.md)
+
+**Final architecture, in short:** a Vite + React 19 app with a narrow `src/api` transport boundary (`requestJson` + typed `ApiError`/`SearchError`), a `src/features/character-search` slice that owns search and pagination state as an explicit `SearchViewState` discriminated union and reaction state as a per-card `ReactionState` union, presentational components under `src/components`, and shared pure helpers under `src/lib` (pagination, reactions grouping, abortable requests). See the architecture document for full detail, including state ownership and the abort/stale-response handling strategy.
+
+**Primary quality evidence:**
+
+- Unit/component tests: `yarn test` / `yarn test:coverage` — Vitest, covering `src/api`, `src/lib`, and the feature's state-derivation logic.
+- End-to-end tests: `yarn test:e2e` — Playwright, covering search, pagination, reactions, request states, retries, clear/reset, keyboard shortcut, and accessibility.
+- Coverage thresholds are enforced in CI (see [Unit tests and coverage](#unit-tests-and-coverage) below).
+- GitHub Actions CI runs validation (tests, coverage, build, Hanfani) and the full E2E suite on every PR and push to `master`.
+
+**Five key PRs** (chronologically last, and most representative of the final quality bar):
+
+- [#42](https://github.com/fruitizz/frontend-tech-test-submission/pull/42) — E2E tests and CI
+- [#45](https://github.com/fruitizz/frontend-tech-test-submission/pull/45) — semantic HTML, accessibility and coverage gate
+- [#47](https://github.com/fruitizz/frontend-tech-test-submission/pull/47) — narrow API/error boundary
+- [#49](https://github.com/fruitizz/frontend-tech-test-submission/pull/49) — feature-oriented architecture
+- [#51](https://github.com/fruitizz/frontend-tech-test-submission/pull/51) — explicit search and reaction view states
+
+PRs [#22–#28](https://github.com/fruitizz/frontend-tech-test-submission/pulls?q=is%3Apr) contain the progressive functional implementation of search, reactions, pagination and request states that the PRs above later hardened and refactored; not every one of the 20+ historical PRs received independent human review, so the five PRs above are the fastest path to evaluating the final quality bar.
+
 ## Introduction
 
 Welcome to the LumApps Frontend Technical Test. In this test, the candidate will need to create a small frontend application using the technologies that we at LumApps use in our daily routine.
@@ -83,7 +109,7 @@ The candidate should fork the repo and create their own, downloading it locally.
 In the project directory, the candidate needs to run: `yarn`
 This will setup the necessary dependencies to execute this project.
 
-The candidate will need to use Node JS v.20.11.1 in order to run this project. Not doing so will result in an error. The candidate can install this particular version using [nvm](https://github.com/nvm-sh/nvm).
+The candidate will need to use Node JS v.20.19.0 or later (see `engines.node` in `package.json`, matched to the CI Node version and to Vite 7's minimum supported Node version) in order to run this project. Not doing so will result in an error. The candidate can install a compatible version using [nvm](https://github.com/nvm-sh/nvm).
 
 To start development, the candidate can execute `yarn start`, which will run the app in development mode.
 

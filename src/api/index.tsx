@@ -4,25 +4,57 @@ import {
   ReactionsResponse,
 } from '../types';
 
+export type ApiErrorKind = 'http' | 'network' | 'parse';
+
+/**
+ * Application-facing API failure. UI should depend on this type only —
+ * never on raw `fetch` / browser transport errors.
+ */
 export class ApiError extends Error {
   constructor(
     message: string,
-    public readonly status: number,
+    public readonly kind: ApiErrorKind,
+    public readonly status?: number,
+    options?: { cause?: unknown },
   ) {
-    super(message);
+    super(message, options);
     this.name = 'ApiError';
   }
 }
 
-async function parseJsonResponse<T>(response: Response): Promise<T> {
+/** Stable user-facing message from any thrown value at the API boundary. */
+export function getErrorMessage(error: unknown): string {
+  if (error instanceof ApiError) {
+    return error.message;
+  }
+  return 'Request failed';
+}
+
+async function requestJson<T>(url: string): Promise<T> {
+  let response: Response;
+
+  try {
+    response = await fetch(url);
+  } catch (cause) {
+    throw new ApiError('Network request failed', 'network', undefined, {
+      cause,
+    });
+  }
+
   if (!response.ok) {
     const detail = response.statusText
       ? `${response.status} ${response.statusText}`
       : String(response.status);
-    throw new ApiError(`API request failed: ${detail}`, response.status);
+    throw new ApiError(`API request failed: ${detail}`, 'http', response.status);
   }
 
-  return response.json() as Promise<T>;
+  try {
+    return (await response.json()) as T;
+  } catch (cause) {
+    throw new ApiError('Invalid API response', 'parse', response.status, {
+      cause,
+    });
+  }
 }
 
 export async function getCharacters({
@@ -36,11 +68,11 @@ export async function getCharacters({
     limit: String(limit),
   });
 
-  const response = await fetch(`/api/characters?${params.toString()}`);
-  return parseJsonResponse<CharactersResponse>(response);
+  return requestJson<CharactersResponse>(
+    `/api/characters?${params.toString()}`,
+  );
 }
 
 export async function getReactions(): Promise<ReactionsResponse> {
-  const response = await fetch('/api/reactions');
-  return parseJsonResponse<ReactionsResponse>(response);
+  return requestJson<ReactionsResponse>('/api/reactions');
 }

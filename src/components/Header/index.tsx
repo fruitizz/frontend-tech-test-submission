@@ -5,6 +5,7 @@ import { Emphasis, FlexBox, IconButton, Size, TextField, Theme, Thumbnail } from
 
 import styles from './Header.module.scss';
 import logo from '../../assets/logo.png';
+import { normalizeSearchQuery } from '../../utils/search';
 
 interface HeaderProps {
   onSearch: (name: string) => void;
@@ -66,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   const submitSearch = () => {
-    const name = draftQuery.trim();
+    const name = normalizeSearchQuery(draftQuery);
     if (!name) {
       return;
     }

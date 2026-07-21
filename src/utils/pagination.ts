@@ -1,5 +1,9 @@
 export type PageItem = number | 'ellipsis';
 
+/** Derive total page count from API total + page size. */
+export const getTotalPages = (total: number, limit: number): number =>
+  Math.max(1, Math.ceil(total / limit));
+
 export const buildPageItems = (
   current: number,
   totalPages: number,

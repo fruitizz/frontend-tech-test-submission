@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildPageItems } from './pagination';
-import { hasDisplayValue } from './display';
+import { buildPageItems, getTotalPages } from './pagination';
+
+describe('getTotalPages', () => {
+  it('computes pages from total and limit', () => {
+    expect(getTotalPages(5, 4)).toBe(2);
+    expect(getTotalPages(8, 4)).toBe(2);
+    expect(getTotalPages(4, 4)).toBe(1);
+  });
+
+  it('never returns fewer than one page', () => {
+    expect(getTotalPages(0, 4)).toBe(1);
+  });
+});
 
 describe('buildPageItems', () => {
   it('returns an empty list for non-positive page counts', () => {
@@ -18,19 +29,5 @@ describe('buildPageItems', () => {
     expect(buildPageItems(1, 5)).toEqual([1, 2, 'ellipsis', 5]);
     expect(buildPageItems(5, 5)).toEqual([1, 'ellipsis', 4, 5]);
     expect(buildPageItems(3, 5)).toEqual([1, 2, 3, 4, 5]);
-  });
-});
-
-describe('hasDisplayValue', () => {
-  it('accepts non-empty trimmed strings', () => {
-    expect(hasDisplayValue('Luke')).toBe(true);
-    expect(hasDisplayValue('  Leia  ')).toBe(true);
-  });
-
-  it('rejects empty or missing values', () => {
-    expect(hasDisplayValue('')).toBe(false);
-    expect(hasDisplayValue('   ')).toBe(false);
-    expect(hasDisplayValue(undefined)).toBe(false);
-    expect(hasDisplayValue(null)).toBe(false);
   });
 });

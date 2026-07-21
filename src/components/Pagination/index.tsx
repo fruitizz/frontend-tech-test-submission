@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@lumx/react';
 
-import { buildPageItems } from '../../utils/pagination';
+import { buildPageItems, getTotalPages } from '../../utils/pagination';
 import styles from './Pagination.module.scss';
 
 interface PaginationProps {
@@ -30,7 +30,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   isLoading,
   onPageChange,
 }) => {
-  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const totalPages = getTotalPages(total, limit);
   const pageItems = buildPageItems(page, totalPages);
   const hasPrevious = page > 1;
   const hasNext = page < totalPages;

@@ -820,7 +820,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:latest":
+"@playwright/test@npm:1.61.1":
   version: 1.61.1
   resolution: "@playwright/test@npm:1.61.1"
   dependencies:
@@ -1652,7 +1652,7 @@ __metadata:
     "@lumx/core": ^3.18.0
     "@lumx/icons": ^3.18.0
     "@lumx/react": ^3.18.0
-    "@playwright/test": latest
+    "@playwright/test": 1.61.1
     "@types/react": ^19.2.2
     "@types/react-dom": ^19.2.2
     "@vitejs/plugin-react": ^5.0.4

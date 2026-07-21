@@ -1,12 +1,30 @@
 import { useCallback, useRef, useState } from 'react';
 
-import { getCharacters, getErrorMessage } from '../../api';
+import {
+  SearchError,
+  getErrorMessage,
+  searchCharacters,
+  type SearchCharactersResult,
+} from '../../api';
 import { createAbortableRequest } from '../../lib/abortable-request';
 import { CharactersResponse } from '../../types';
-import { buildGetCharactersParams } from './search-params';
+import { buildSearchCharactersInput } from './search-params';
 
 interface RequestCharactersOptions {
   clearResults?: boolean;
+}
+
+function toCharactersResponse(
+  result: SearchCharactersResult,
+): CharactersResponse {
+  return {
+    results: result.items,
+    total: result.total,
+    page: result.page,
+    limit: result.pageSize,
+    next: null,
+    previous: null,
+  };
 }
 
 export function useCharacterSearch() {
@@ -24,7 +42,7 @@ export function useCharacterSearch() {
       nextPage: number,
       { clearResults = false }: RequestCharactersOptions = {},
     ) => {
-      const requestId = requestControllerRef.current.next();
+      const { id: requestId, signal } = requestControllerRef.current.next();
 
       setSubmittedQuery(name);
       setPage(nextPage);
@@ -37,20 +55,23 @@ export function useCharacterSearch() {
       }
 
       try {
-        const response = await getCharacters(
-          buildGetCharactersParams(name, nextPage),
+        const result = await searchCharacters(
+          buildSearchCharactersInput(name, nextPage, signal),
         );
         if (!requestControllerRef.current.isCurrent(requestId)) {
           return;
         }
-        setCharactersResponse(response);
-        setPage(response.page);
+        setCharactersResponse(toCharactersResponse(result));
+        setPage(result.page);
       } catch (err) {
         if (!requestControllerRef.current.isCurrent(requestId)) {
           return;
         }
+        if (err instanceof SearchError && err.code === 'request_aborted') {
+          return;
+        }
         setCharactersResponse(null);
-        setError(getErrorMessage(err));
+        setError(getErrorMessage(err) || 'Request failed');
       } finally {
         if (requestControllerRef.current.isCurrent(requestId)) {
           setIsLoading(false);
@@ -85,7 +106,7 @@ export function useCharacterSearch() {
   }, [isLoading, page, requestCharacters, submittedQuery]);
 
   const handleClearSearch = useCallback(() => {
-    // Invalidate any in-flight character request so a late response is ignored.
+    // Abort + invalidate so a late response cannot overwrite idle state.
     requestControllerRef.current.invalidate();
     setSubmittedQuery('');
     setCharactersResponse(null);

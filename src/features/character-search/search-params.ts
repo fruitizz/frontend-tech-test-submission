@@ -1,14 +1,16 @@
-import { GetCharactersParams } from '../../types';
+import { SearchCharactersInput } from '../../api';
 
-export const PAGE_SIZE = 4;
+export const PAGE_SIZE = 4 as const;
 
-export function buildGetCharactersParams(
-  name: string,
+export function buildSearchCharactersInput(
+  query: string,
   page: number,
-): GetCharactersParams {
+  signal?: AbortSignal,
+): SearchCharactersInput {
   return {
-    name,
+    query,
     page,
-    limit: PAGE_SIZE,
+    pageSize: PAGE_SIZE,
+    signal,
   };
 }

@@ -1,19 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildGetCharactersParams, PAGE_SIZE } from './search-params';
+import { buildSearchCharactersInput, PAGE_SIZE } from './search-params';
 
-describe('PAGE_SIZE', () => {
-  it('matches the API page size used for character search', () => {
-    expect(PAGE_SIZE).toBe(4);
-  });
-});
-
-describe('buildGetCharactersParams', () => {
-  it('builds params from name and page', () => {
-    expect(buildGetCharactersParams('sky', 2)).toEqual({
-      name: 'sky',
+describe('buildSearchCharactersInput', () => {
+  it('builds a search input with the fixed page size', () => {
+    expect(buildSearchCharactersInput('sky', 2)).toEqual({
+      query: 'sky',
       page: 2,
-      limit: PAGE_SIZE,
+      pageSize: PAGE_SIZE,
+      signal: undefined,
     });
+  });
+
+  it('forwards an abort signal when provided', () => {
+    const signal = new AbortController().signal;
+    expect(buildSearchCharactersInput('sky', 1, signal).signal).toBe(signal);
   });
 });

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { getReactions } from '../../api';
+import { ApiError, getReactions, isAbortError } from '../../api';
 import { groupActiveReactionsByCharacterId } from '../../lib/reactions';
 import { Reaction } from '../../types';
 
@@ -10,24 +10,26 @@ export function useCharacterReactions() {
   >({});
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
 
-    getReactions()
+    getReactions(controller.signal)
       .then((response) => {
-        if (!cancelled) {
-          setReactionsByCharacterId(
-            groupActiveReactionsByCharacterId(response.reactions),
-          );
-        }
+        setReactionsByCharacterId(
+          groupActiveReactionsByCharacterId(response.reactions),
+        );
       })
-      .catch(() => {
-        if (!cancelled) {
-          setReactionsByCharacterId({});
+      .catch((error: unknown) => {
+        if (isAbortError(error) || controller.signal.aborted) {
+          return;
         }
+        if (error instanceof ApiError && error.kind === 'aborted') {
+          return;
+        }
+        setReactionsByCharacterId({});
       });
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, []);
 

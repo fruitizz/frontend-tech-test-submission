@@ -2,9 +2,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   ApiError,
+  SearchError,
+  getCharacterReactions,
   getCharacters,
   getErrorMessage,
   getReactions,
+  searchCharacters,
+  toSearchError,
 } from './index';
 
 describe('api client', () => {
@@ -34,7 +38,83 @@ describe('api client', () => {
 
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/characters?name=sky&page=1&limit=4',
+      undefined,
     );
+  });
+
+  it('searchCharacters returns a feature-facing result shape', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          results: [{ id: 1, name: 'Luke', affiliations: [] }],
+          total: 1,
+          page: 1,
+          limit: 4,
+          next: null,
+          previous: null,
+        }),
+      }),
+    );
+
+    await expect(
+      searchCharacters({ query: 'sky', page: 1, pageSize: 4 }),
+    ).resolves.toEqual({
+      items: [{ id: 1, name: 'Luke', affiliations: [] }],
+      total: 1,
+      page: 1,
+      pageSize: 4,
+    });
+  });
+
+  it('searchCharacters forwards AbortSignal to fetch', async () => {
+    const signal = new AbortController().signal;
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        results: [],
+        total: 0,
+        page: 1,
+        limit: 4,
+        next: null,
+        previous: null,
+      }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await searchCharacters({ query: 'sky', page: 1, pageSize: 4, signal });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/characters?name=sky&page=1&limit=4',
+      { signal },
+    );
+  });
+
+  it('searchCharacters maps network failures to SearchError codes', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockRejectedValue(new TypeError('Failed to fetch')),
+    );
+
+    await expect(
+      searchCharacters({ query: 'sky', page: 1, pageSize: 4 }),
+    ).rejects.toMatchObject({
+      name: 'SearchError',
+      code: 'network_error',
+    });
+  });
+
+  it('searchCharacters maps aborted fetch to request_aborted', async () => {
+    const abortError = new DOMException('Aborted', 'AbortError');
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(abortError));
+
+    await expect(
+      searchCharacters({ query: 'sky', page: 1, pageSize: 4 }),
+    ).rejects.toMatchObject({
+      name: 'SearchError',
+      code: 'request_aborted',
+    });
   });
 
   it('encodes special characters in the name query param', async () => {
@@ -55,6 +135,7 @@ describe('api client', () => {
 
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/characters?name=darth+vader+%26+co&page=2&limit=4',
+      undefined,
     );
   });
 
@@ -125,7 +206,27 @@ describe('api client', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     await expect(getReactions()).resolves.toEqual({ reactions: [] });
-    expect(fetchMock).toHaveBeenCalledWith('/api/reactions');
+    expect(fetchMock).toHaveBeenCalledWith('/api/reactions', undefined);
+  });
+
+  it('getCharacterReactions filters active reactions for one character', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          reactions: [
+            { id: 'a', content: '👍', characterId: 1, deleted: false },
+            { id: 'b', content: '👎', characterId: 1, deleted: true },
+            { id: 'c', content: '❤️', characterId: 2, deleted: false },
+          ],
+        }),
+      }),
+    );
+
+    await expect(getCharacterReactions(1)).resolves.toEqual([
+      { id: 'a', content: '👍', characterId: 1, deleted: false },
+    ]);
   });
 
   it('throws ApiError for failed reaction HTTP responses', async () => {
@@ -146,15 +247,31 @@ describe('api client', () => {
   });
 });
 
-describe('getErrorMessage', () => {
-  it('returns ApiError messages for UI display', () => {
-    expect(getErrorMessage(new ApiError('Network request failed', 'network'))).toBe(
-      'Network request failed',
+describe('SearchError mapping', () => {
+  it('maps ApiError kinds onto SearchError codes', () => {
+    expect(toSearchError(new ApiError('n', 'network')).code).toBe(
+      'network_error',
+    );
+    expect(toSearchError(new ApiError('p', 'parse')).code).toBe(
+      'invalid_response',
+    );
+    expect(toSearchError(new ApiError('a', 'aborted')).code).toBe(
+      'request_aborted',
+    );
+    expect(toSearchError(new ApiError('h', 'http', 500)).code).toBe(
+      'unknown_error',
     );
   });
 
-  it('hides unknown thrown values behind a stable fallback', () => {
-    expect(getErrorMessage('boom')).toBe('Request failed');
-    expect(getErrorMessage(new TypeError('Failed to fetch'))).toBe('Request failed');
+  it('getErrorMessage hides aborted failures', () => {
+    expect(
+      getErrorMessage(new SearchError('Request aborted', 'request_aborted')),
+    ).toBe('');
+    expect(
+      getErrorMessage(new SearchError('Network request failed', 'network_error')),
+    ).toBe('Network request failed');
+    expect(getErrorMessage(new TypeError('Failed to fetch'))).toBe(
+      'Request failed',
+    );
   });
 });

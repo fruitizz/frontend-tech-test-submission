@@ -1,11 +1,17 @@
-import { ApiError } from './api-errors';
+import { ApiError, isAbortError } from './api-errors';
 
-export async function requestJson<T>(url: string): Promise<T> {
+export async function requestJson<T>(
+  url: string,
+  init?: RequestInit,
+): Promise<T> {
   let response: Response;
 
   try {
-    response = await fetch(url);
+    response = await fetch(url, init);
   } catch (cause) {
+    if (isAbortError(cause) || init?.signal?.aborted) {
+      throw new ApiError('Request aborted', 'aborted', undefined, { cause });
+    }
     throw new ApiError('Network request failed', 'network', undefined, {
       cause,
     });

@@ -6,8 +6,21 @@
 }
 
 .controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lumx-spacing-unit-regular);
   width: 100%;
   min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.controls > li {
+  display: flex;
+  align-items: center;
 }
 
 // Keep page controls square using LumX size tokens (colors/typography come from Button/IconButton/Text).

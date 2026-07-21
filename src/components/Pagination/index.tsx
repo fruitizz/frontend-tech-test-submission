@@ -6,7 +6,6 @@ import {
   ColorPalette,
   ColorVariant,
   Emphasis,
-  FlexBox,
   IconButton,
   Size,
   Text,
@@ -42,69 +41,67 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <nav className={styles.pagination} aria-label="Search results pagination">
-      <FlexBox
-        className={styles.controls}
-        orientation="horizontal"
-        vAlign="center"
-        hAlign="center"
-        gap={Size.regular}
-        wrap
-      >
-        <IconButton
-          className={styles.control}
-          label="Previous page"
-          icon={mdiChevronLeft}
-          emphasis={Emphasis.medium}
-          size={Size.m}
-          type="button"
-          hideTooltip
-          isDisabled={isLoading || !hasPrevious}
-          onClick={() => onPageChange(page - 1)}
-        />
+      <ul className={styles.controls}>
+        <li>
+          <IconButton
+            className={styles.control}
+            label="Previous page"
+            icon={mdiChevronLeft}
+            emphasis={Emphasis.medium}
+            size={Size.m}
+            type="button"
+            hideTooltip
+            isDisabled={isLoading || !hasPrevious}
+            onClick={() => onPageChange(page - 1)}
+          />
+        </li>
 
         {pageItems.map((item, index) =>
           item === 'ellipsis' ? (
-            <Text
-              key={`ellipsis-${index}`}
-              as="span"
-              className={styles.ellipsis}
-              typography={Typography.body1}
-              color={ColorPalette.dark}
-              colorVariant={ColorVariant.L2}
-              aria-hidden="true"
-            >
-              …
-            </Text>
+            <li key={`ellipsis-${index}`} aria-hidden="true">
+              <Text
+                as="span"
+                className={styles.ellipsis}
+                typography={Typography.body1}
+                color={ColorPalette.dark}
+                colorVariant={ColorVariant.L2}
+              >
+                …
+              </Text>
+            </li>
           ) : (
-            <Button
-              key={item}
-              className={styles.control}
-              emphasis={Emphasis.medium}
-              size={Size.m}
-              type="button"
-              isSelected={item === page}
-              isDisabled={isLoading}
-              aria-label={`Page ${item}`}
-              aria-current={item === page ? 'page' : undefined}
-              onClick={() => onPageChange(item)}
-            >
-              {item}
-            </Button>
+            <li key={item}>
+              <Button
+                className={styles.control}
+                emphasis={Emphasis.medium}
+                size={Size.m}
+                type="button"
+                isSelected={item === page}
+                isDisabled={isLoading}
+                aria-label={`Page ${item}`}
+                aria-current={item === page ? 'page' : undefined}
+                onClick={() => onPageChange(item)}
+              >
+                {item}
+              </Button>
+            </li>
           ),
         )}
 
-        <IconButton
-          className={styles.control}
-          label="Next page"
-          icon={mdiChevronRight}
-          emphasis={Emphasis.medium}
-          size={Size.m}
-          type="button"
-          hideTooltip
-          isDisabled={isLoading || !hasNext}
-          onClick={() => onPageChange(page + 1)}
-        />
-      </FlexBox>
+        <li>
+          <IconButton
+            className={styles.control}
+            label="Next page"
+            icon={mdiChevronRight}
+            emphasis={Emphasis.medium}
+            size={Size.m}
+            type="button"
+            hideTooltip
+            isDisabled={isLoading || !hasNext}
+            onClick={() => onPageChange(page + 1)}
+          />
+        </li>
+      </ul>
     </nav>
   );
 };

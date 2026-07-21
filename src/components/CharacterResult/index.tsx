@@ -3,7 +3,6 @@ import React from 'react';
 import { mdiImageBroken } from '@lumx/icons';
 import {
   AspectRatio,
-  Chip,
   ColorPalette,
   ColorVariant,
   FlexBox,
@@ -17,6 +16,7 @@ import {
 
 import { hasDisplayValue } from '../../utils/display';
 import { Character, Reaction } from '../../types';
+import { StaticChip } from './StaticChip';
 import styles from './CharacterResult.module.scss';
 
 interface CharacterResultProps {
@@ -71,16 +71,12 @@ export const CharacterResult: React.FC<CharacterResultProps> = ({
             <ul className={styles.meta} aria-label="Character details">
               {hasDisplayValue(character.species) && (
                 <li className={styles.metaItem}>
-                  <Chip size={Size.s} color={ColorPalette.blue}>
-                    {character.species}
-                  </Chip>
+                  <StaticChip color={ColorPalette.blue}>{character.species}</StaticChip>
                 </li>
               )}
               {hasDisplayValue(character.birthYear) && (
                 <li className={styles.metaItem}>
-                  <Chip size={Size.s} color={ColorPalette.green}>
-                    {character.birthYear}
-                  </Chip>
+                  <StaticChip color={ColorPalette.green}>{character.birthYear}</StaticChip>
                 </li>
               )}
             </ul>
@@ -103,9 +99,7 @@ export const CharacterResult: React.FC<CharacterResultProps> = ({
           <ul className={styles.affiliations} aria-label="Affiliations">
             {affiliations.map((affiliation) => (
               <li key={affiliation} className={styles.affiliationItem}>
-                <Chip size={Size.s} color={ColorPalette.yellow}>
-                  {affiliation}
-                </Chip>
+                <StaticChip color={ColorPalette.yellow}>{affiliation}</StaticChip>
               </li>
             ))}
           </ul>

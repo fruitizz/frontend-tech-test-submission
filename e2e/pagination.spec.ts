@@ -84,6 +84,30 @@ test.describe('pagination', () => {
     await expectCharacterVisible(page, twoPageDataset[2].results[0]);
   });
 
+  test('navigates with keyboard focus and Enter', async ({ page }) => {
+    const requests: string[] = [];
+
+    await mockCharacters(page, async (route) => {
+      requests.push(route.request().url());
+      await successPageHandler(twoPageDataset)(route);
+    });
+    await gotoApp(page);
+    await submitSearch(page, 'sky');
+    await expectCharacterVisible(page, characterLuke);
+
+    await nextPageButton(page).focus();
+    await expect(nextPageButton(page)).toBeFocused();
+    await page.keyboard.press('Enter');
+
+    await expectCharacterVisible(page, twoPageDataset[2].results[0]);
+    expect(parseCharactersUrl(requests[requests.length - 1]).page).toBe('2');
+
+    await page.getByRole('button', { name: 'Page 1' }).focus();
+    await page.keyboard.press('Enter');
+    await expectCharacterVisible(page, characterLuke);
+    expect(parseCharactersUrl(requests[requests.length - 1]).page).toBe('1');
+  });
+
   test('keeps query when changing pages', async ({ page }) => {
     const requests: string[] = [];
 

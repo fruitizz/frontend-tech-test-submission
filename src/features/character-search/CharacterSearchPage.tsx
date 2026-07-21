@@ -6,50 +6,23 @@ import { CharacterGrid } from '../../components/CharacterGrid';
 import { EmptyState } from '../../components/EmptyState';
 import { ErrorState } from '../../components/ErrorState';
 import { SearchCommand } from '../../components/SearchCommand';
+import { getErrorMessage } from '../../api';
 import { useCharacterReactions } from './useCharacterReactions';
 import { useCharacterSearch } from './useCharacterSearch';
 import styles from './CharacterSearchPage.module.scss';
 
 export const CharacterSearchPage: React.FC = () => {
-  const {
-    submittedQuery,
-    isLoading,
-    error,
-    isEmptyResponse,
-    isInitialLoading,
-    resultsResponse,
-    handleSearch,
-    handlePageChange,
-    handleRetry,
-    handleClearSearch,
-  } = useCharacterSearch();
-  const { reactionsByCharacterId } = useCharacterReactions();
+  const { state, handleSearch, handlePageChange, handleRetry, handleClearSearch } =
+    useCharacterSearch();
+  const { getReactionState } = useCharacterReactions();
 
   const main = (
     <main className={`lumx-spacing-padding-huge ${styles.content}`}>
-      {!submittedQuery && <EmptyState variant="idle" />}
-
-      {submittedQuery && error && !isLoading && (
-        <ErrorState error={error} onRetry={handleRetry} />
-      )}
-
-      {submittedQuery && isInitialLoading && (
-        <CharacterCardSkeleton query={submittedQuery} />
-      )}
-
-      {submittedQuery && !isLoading && !error && isEmptyResponse && (
-        <EmptyState variant="empty" query={submittedQuery} />
-      )}
-
-      {resultsResponse && (
-        <CharacterGrid
-          resultsResponse={resultsResponse}
-          reactionsByCharacterId={reactionsByCharacterId}
-          submittedQuery={submittedQuery}
-          isLoading={isLoading}
-          onPageChange={handlePageChange}
-        />
-      )}
+      {renderSearchState(state, {
+        getReactionState,
+        onPageChange: handlePageChange,
+        onRetry: handleRetry,
+      })}
     </main>
   );
 
@@ -59,10 +32,67 @@ export const CharacterSearchPage: React.FC = () => {
         <SearchCommand
           onSearch={handleSearch}
           onClearSearch={handleClearSearch}
-          hasActiveSearch={Boolean(submittedQuery)}
+          hasActiveSearch={state.status !== 'idle'}
         />
       }
       main={main}
     />
   );
 };
+
+interface RenderSearchStateOptions {
+  getReactionState: ReturnType<typeof useCharacterReactions>['getReactionState'];
+  onPageChange: (nextPage: number) => void;
+  onRetry: () => void;
+}
+
+/**
+ * Exhaustive switch over {@link SearchViewState}: every status renders
+ * exactly one view, so there is no combination of loading/error/empty
+ * flags that can contradict itself.
+ */
+function renderSearchState(
+  state: ReturnType<typeof useCharacterSearch>['state'],
+  { getReactionState, onPageChange, onRetry }: RenderSearchStateOptions,
+): React.ReactNode {
+  switch (state.status) {
+    case 'idle':
+      return <EmptyState variant="idle" />;
+
+    case 'loading':
+      if (!state.previousResults) {
+        return <CharacterCardSkeleton query={state.query} />;
+      }
+      return (
+        <CharacterGrid
+          data={state.previousResults}
+          getReactionState={getReactionState}
+          submittedQuery={state.query}
+          isPageLoading
+          onPageChange={onPageChange}
+        />
+      );
+
+    case 'success':
+      return (
+        <CharacterGrid
+          data={state.data}
+          getReactionState={getReactionState}
+          submittedQuery={state.query}
+          isPageLoading={false}
+          onPageChange={onPageChange}
+        />
+      );
+
+    case 'empty':
+      return <EmptyState variant="empty" query={state.query} />;
+
+    case 'error':
+      return <ErrorState error={getErrorMessage(state.error)} onRetry={onRetry} />;
+
+    default: {
+      const exhaustiveCheck: never = state;
+      throw new Error(`Unhandled search view state: ${JSON.stringify(exhaustiveCheck)}`);
+    }
+  }
+}

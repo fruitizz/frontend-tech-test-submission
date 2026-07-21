@@ -14,19 +14,20 @@ import {
   Typography,
 } from '@lumx/react';
 
+import { ReactionState } from '../../features/character-search/reaction-state';
 import { hasDisplayValue } from '../../lib/display';
-import { Character, Reaction } from '../../types';
+import { Character } from '../../types';
 import { StaticChip } from './StaticChip';
 import styles from './CharacterCard.module.scss';
 
 interface CharacterCardProps {
   character: Character;
-  reactions: Reaction[];
+  reactionState: ReactionState;
 }
 
 export const CharacterCard: React.FC<CharacterCardProps> = ({
   character,
-  reactions,
+  reactionState,
 }) => {
   const affiliations = character.affiliations.filter(hasDisplayValue);
   const imageUrl = hasDisplayValue(character.imageUrl) ? character.imageUrl : null;
@@ -105,9 +106,9 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
           </ul>
         )}
 
-        {reactions.length > 0 && (
+        {reactionState.status === 'success' && (
           <ul className={styles.reactions} aria-label={`Reactions for ${character.name}`}>
-            {reactions.map((reaction, index) => (
+            {reactionState.reactions.map((reaction, index) => (
               <li
                 key={`${reaction.id}-${index}`}
                 className={styles.reaction}

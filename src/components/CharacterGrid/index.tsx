@@ -11,28 +11,27 @@ import {
   Typography,
 } from '@lumx/react';
 
-import { CharactersResponse, Reaction } from '../../types';
+import { ReactionState } from '../../features/character-search/reaction-state';
+import { SearchResultsData } from '../../features/character-search/search-view-state';
 import { CharacterCard } from '../CharacterCard';
 import { Pagination } from '../Pagination';
 import styles from './CharacterGrid.module.scss';
 
 interface CharacterGridProps {
-  resultsResponse: CharactersResponse;
-  reactionsByCharacterId: Record<number, Reaction[]>;
+  data: SearchResultsData;
+  getReactionState: (characterId: number) => ReactionState;
   submittedQuery: string;
-  isLoading: boolean;
+  isPageLoading: boolean;
   onPageChange: (nextPage: number) => void;
 }
 
 export const CharacterGrid: React.FC<CharacterGridProps> = ({
-  resultsResponse,
-  reactionsByCharacterId,
+  data,
+  getReactionState,
   submittedQuery,
-  isLoading,
+  isPageLoading,
   onPageChange,
 }) => {
-  const isPageLoading = isLoading;
-
   return (
     <section
       className={styles.results}
@@ -69,24 +68,24 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({
         colorVariant={ColorVariant.L1}
         className={styles.summary}
       >
-        Results for “{submittedQuery}” (page {resultsResponse.page}, total{' '}
-        {resultsResponse.total})
+        Results for “{submittedQuery}” (page {data.page}, total{' '}
+        {data.total})
       </Text>
       <ul className={styles.resultList}>
-        {resultsResponse.results.map((character) => (
+        {data.results.map((character) => (
           <li key={character.id} className={styles.resultItem}>
             <CharacterCard
               character={character}
-              reactions={reactionsByCharacterId[character.id] ?? []}
+              reactionState={getReactionState(character.id)}
             />
           </li>
         ))}
       </ul>
       <Pagination
-        page={resultsResponse.page}
-        total={resultsResponse.total}
-        limit={resultsResponse.limit}
-        isLoading={isLoading}
+        page={data.page}
+        total={data.total}
+        limit={data.pageSize}
+        isLoading={isPageLoading}
         onPageChange={onPageChange}
       />
     </section>

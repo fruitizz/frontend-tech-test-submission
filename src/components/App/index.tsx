@@ -8,8 +8,8 @@ import {
 
 import { Header } from '../Header';
 import { Content } from '../Content';
-import { getCharacters, getReactions } from '../../api';
-import { CharactersResponse } from '../../types';
+import { getCharacters, getErrorMessage, getReactions } from '../../api';
+import { CharactersResponse, Reaction } from '../../types';
 import { groupActiveReactionsByCharacterId } from '../../utils/reactions';
 
 const PAGE_SIZE = 4;
@@ -80,7 +80,7 @@ export const App: React.FC = () => {
         return;
       }
       setCharactersResponse(null);
-      setError(err instanceof Error ? err.message : 'Request failed');
+      setError(getErrorMessage(err));
     } finally {
       if (requestId === requestIdRef.current) {
         setIsLoading(false);

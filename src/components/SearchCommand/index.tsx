@@ -3,11 +3,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { mdiCloseCircle, mdiMagnify } from '@lumx/icons';
 import { Emphasis, FlexBox, IconButton, Size, TextField, Theme, Thumbnail } from '@lumx/react';
 
-import styles from './Header.module.scss';
 import logo from '../../assets/logo.png';
-import { normalizeSearchQuery } from '../../utils/search';
+import { normalizeSearchQuery } from '../../lib/search';
+import styles from './SearchCommand.module.scss';
 
-interface HeaderProps {
+interface SearchCommandProps {
   onSearch: (name: string) => void;
   onClearSearch: () => void;
   hasActiveSearch: boolean;
@@ -32,7 +32,7 @@ const SEARCH_SHORTCUT_PLACEHOLDER =
     ? 'Search (⌘K)'
     : 'Search (Ctrl+K)';
 
-export const Header: React.FC<HeaderProps> = ({
+export const SearchCommand: React.FC<SearchCommandProps> = ({
   onSearch,
   onClearSearch,
   hasActiveSearch,

@@ -14,17 +14,17 @@ import {
   Typography,
 } from '@lumx/react';
 
-import { hasDisplayValue } from '../../utils/display';
+import { hasDisplayValue } from '../../lib/display';
 import { Character, Reaction } from '../../types';
 import { StaticChip } from './StaticChip';
-import styles from './CharacterResult.module.scss';
+import styles from './CharacterCard.module.scss';
 
-interface CharacterResultProps {
+interface CharacterCardProps {
   character: Character;
   reactions: Reaction[];
 }
 
-export const CharacterResult: React.FC<CharacterResultProps> = ({
+export const CharacterCard: React.FC<CharacterCardProps> = ({
   character,
   reactions,
 }) => {

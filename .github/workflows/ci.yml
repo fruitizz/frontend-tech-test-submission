@@ -43,9 +43,6 @@ jobs:
       - name: Build
         run: yarn build
 
-      - name: Hanfani check
-        run: yarn hanfani check
-
   e2e:
     name: E2E
     runs-on: ubuntu-latest

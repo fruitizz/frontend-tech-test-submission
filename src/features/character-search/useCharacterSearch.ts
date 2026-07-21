@@ -1,39 +1,21 @@
 import { useCallback, useRef, useState } from 'react';
 
-import {
-  SearchError,
-  getErrorMessage,
-  searchCharacters,
-  type SearchCharactersResult,
-} from '../../api';
+import { searchCharacters, toSearchError } from '../../api';
 import { createAbortableRequest } from '../../lib/abortable-request';
-import { CharactersResponse } from '../../types';
 import { buildSearchCharactersInput } from './search-params';
+import {
+  SearchResultsData,
+  SearchViewState,
+  deriveViewState,
+  idleViewState,
+} from './search-view-state';
 
 interface RequestCharactersOptions {
   clearResults?: boolean;
 }
 
-function toCharactersResponse(
-  result: SearchCharactersResult,
-): CharactersResponse {
-  return {
-    results: result.items,
-    total: result.total,
-    page: result.page,
-    limit: result.pageSize,
-    next: null,
-    previous: null,
-  };
-}
-
 export function useCharacterSearch() {
-  const [charactersResponse, setCharactersResponse] =
-    useState<CharactersResponse | null>(null);
-  const [submittedQuery, setSubmittedQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
+  const [state, setState] = useState<SearchViewState>(idleViewState);
   const requestControllerRef = useRef(createAbortableRequest());
 
   const requestCharacters = useCallback(
@@ -44,15 +26,19 @@ export function useCharacterSearch() {
     ) => {
       const { id: requestId, signal } = requestControllerRef.current.next();
 
-      setSubmittedQuery(name);
-      setPage(nextPage);
-      setIsLoading(true);
-      setError(null);
-      // New searches clear prior results so the initial loading state shows.
-      // Pagination keeps the current cards visible until the next page replaces them.
-      if (clearResults) {
-        setCharactersResponse(null);
-      }
+      // New searches drop stale results so the initial loading state shows.
+      // Pagination keeps the current page's data visible until it resolves.
+      setState((previous) => {
+        const previousResults = clearResults
+          ? null
+          : getResultsData(previous);
+        return {
+          status: 'loading',
+          query: name,
+          page: nextPage,
+          previousResults,
+        };
+      });
 
       try {
         const result = await searchCharacters(
@@ -61,21 +47,26 @@ export function useCharacterSearch() {
         if (!requestControllerRef.current.isCurrent(requestId)) {
           return;
         }
-        setCharactersResponse(toCharactersResponse(result));
-        setPage(result.page);
+        const data: SearchResultsData = {
+          results: result.items,
+          total: result.total,
+          page: result.page,
+          pageSize: result.pageSize,
+        };
+        setState(
+          deriveViewState({ query: name, page: result.page, kind: 'result', data }),
+        );
       } catch (err) {
         if (!requestControllerRef.current.isCurrent(requestId)) {
           return;
         }
-        if (err instanceof SearchError && err.code === 'request_aborted') {
+        const error = toSearchError(err);
+        if (error.code === 'request_aborted') {
           return;
         }
-        setCharactersResponse(null);
-        setError(getErrorMessage(err) || 'Request failed');
-      } finally {
-        if (requestControllerRef.current.isCurrent(requestId)) {
-          setIsLoading(false);
-        }
+        setState(
+          deriveViewState({ query: name, page: nextPage, kind: 'error', error }),
+        );
       }
     },
     [],
@@ -90,53 +81,43 @@ export function useCharacterSearch() {
 
   const handlePageChange = useCallback(
     (nextPage: number) => {
-      if (!submittedQuery || isLoading) {
+      if (state.status === 'loading' || state.status === 'idle') {
         return;
       }
-      requestCharacters(submittedQuery, nextPage);
+      requestCharacters(state.query, nextPage);
     },
-    [isLoading, requestCharacters, submittedQuery],
+    [requestCharacters, state],
   );
 
   const handleRetry = useCallback(() => {
-    if (!submittedQuery || isLoading) {
+    if (state.status !== 'error') {
       return;
     }
-    requestCharacters(submittedQuery, page);
-  }, [isLoading, page, requestCharacters, submittedQuery]);
+    requestCharacters(state.query, state.page);
+  }, [requestCharacters, state]);
 
   const handleClearSearch = useCallback(() => {
     // Abort + invalidate so a late response cannot overwrite idle state.
     requestControllerRef.current.invalidate();
-    setSubmittedQuery('');
-    setCharactersResponse(null);
-    setPage(1);
-    setError(null);
-    setIsLoading(false);
+    setState(idleViewState);
   }, []);
 
-  const hasResults =
-    charactersResponse !== null && charactersResponse.results.length > 0;
-  const isEmptyResponse =
-    charactersResponse !== null && charactersResponse.results.length === 0;
-  const isInitialLoading = isLoading && !hasResults;
-  const isPageLoading = isLoading && hasResults;
-  const resultsResponse = hasResults ? charactersResponse : null;
-
   return {
-    charactersResponse,
-    submittedQuery,
-    isLoading,
-    error,
-    page,
-    hasResults,
-    isEmptyResponse,
-    isInitialLoading,
-    isPageLoading,
-    resultsResponse,
+    state,
     handleSearch,
     handlePageChange,
     handleRetry,
     handleClearSearch,
   };
+}
+
+/** Best-known results for a state, used to keep cards visible while paginating. */
+function getResultsData(state: SearchViewState): SearchResultsData | null {
+  if (state.status === 'success') {
+    return state.data;
+  }
+  if (state.status === 'loading') {
+    return state.previousResults;
+  }
+  return null;
 }

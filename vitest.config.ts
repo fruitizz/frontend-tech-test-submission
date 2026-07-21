@@ -13,6 +13,8 @@ export default defineConfig({
         'src/api/**/*.{ts,tsx}',
         'src/lib/**/*.{ts,tsx}',
         'src/features/**/search-params.ts',
+        'src/features/**/search-view-state.ts',
+        'src/features/**/reaction-state.ts',
       ],
       exclude: ['src/**/*.test.ts'],
       thresholds: {

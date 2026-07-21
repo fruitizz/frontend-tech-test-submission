@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@lumx/react';
 
-import { buildPageItems, getTotalPages } from '../../utils/pagination';
+import { buildPageItems, getTotalPages } from '../../lib/pagination';
 import styles from './Pagination.module.scss';
 
 interface PaginationProps {

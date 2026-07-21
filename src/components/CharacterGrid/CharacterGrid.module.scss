@@ -30,20 +30,3 @@
 .pageLoading {
   margin-bottom: var(--lumx-spacing-unit-tiny);
 }
-
-.state {
-  max-width: 28rem;
-  margin: var(--lumx-spacing-unit-huge) auto;
-  text-align: center;
-  min-width: 0;
-  align-items: center;
-}
-
-.stateTitle {
-  margin: 0;
-}
-
-.stateMessage {
-  margin: 0;
-  overflow-wrap: anywhere;
-}

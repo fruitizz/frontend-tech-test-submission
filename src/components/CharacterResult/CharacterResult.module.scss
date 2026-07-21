@@ -49,6 +49,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--lumx-spacing-unit-regular);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.metaItem {
+  display: flex;
 }
 
 .description {
@@ -60,6 +67,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--lumx-spacing-unit-regular);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.affiliationItem {
+  display: flex;
 }
 
 .reactions {

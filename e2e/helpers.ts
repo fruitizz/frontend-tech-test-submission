@@ -10,7 +10,7 @@ import {
 import type { Character, CharactersResponse, Reaction } from '../src/types';
 
 export const searchInput = (page: Page) =>
-  page.getByRole('textbox', { name: /search/i });
+  page.getByRole('searchbox', { name: /search/i });
 
 export const clearButton = (page: Page) =>
   page.getByRole('button', { name: 'Clear search' });

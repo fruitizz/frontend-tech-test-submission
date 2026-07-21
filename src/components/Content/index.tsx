@@ -63,7 +63,7 @@ const ContentStatus: React.FC<ContentStatusProps> = ({
       colorVariant={ColorVariant.L2}
     />
     <Text
-      as="p"
+      as="h2"
       typography={Typography.custom.title3}
       color={ColorPalette.dark}
       colorVariant={ColorVariant.N}
@@ -104,7 +104,7 @@ export const Content: React.FC<ContentProps> = ({
   const resultsResponse = hasResults ? charactersResponse : null;
 
   return (
-    <section className={`lumx-spacing-padding-huge ${styles.content}`}>
+    <main className={`lumx-spacing-padding-huge ${styles.content}`}>
       {!submittedQuery && (
         <ContentStatus
           icon={mdiMagnify}
@@ -120,7 +120,7 @@ export const Content: React.FC<ContentProps> = ({
           description={error}
           role="alert"
         >
-          <Button emphasis={Emphasis.high} onClick={onRetry}>
+          <Button emphasis={Emphasis.high} type="button" onClick={onRetry}>
             Retry
           </Button>
         </ContentStatus>
@@ -159,8 +159,9 @@ export const Content: React.FC<ContentProps> = ({
       )}
 
       {resultsResponse && (
-        <div
+        <section
           className={styles.results}
+          aria-labelledby="search-results-summary"
           aria-busy={isPageLoading}
         >
           {isPageLoading && (
@@ -187,6 +188,7 @@ export const Content: React.FC<ContentProps> = ({
 
           <Text
             as="p"
+            id="search-results-summary"
             typography={Typography.body2}
             color={ColorPalette.dark}
             colorVariant={ColorVariant.L1}
@@ -195,13 +197,16 @@ export const Content: React.FC<ContentProps> = ({
             Results for “{submittedQuery}” (page {resultsResponse.page}, total{' '}
             {resultsResponse.total})
           </Text>
-          {resultsResponse.results.map((character) => (
-            <CharacterResult
-              key={character.id}
-              character={character}
-              reactions={reactionsByCharacterId[character.id] ?? []}
-            />
-          ))}
+          <ul className={styles.resultList}>
+            {resultsResponse.results.map((character) => (
+              <li key={character.id} className={styles.resultItem}>
+                <CharacterResult
+                  character={character}
+                  reactions={reactionsByCharacterId[character.id] ?? []}
+                />
+              </li>
+            ))}
+          </ul>
           <Pagination
             page={resultsResponse.page}
             total={resultsResponse.total}
@@ -209,8 +214,8 @@ export const Content: React.FC<ContentProps> = ({
             isLoading={isLoading}
             onPageChange={onPageChange}
           />
-        </div>
+        </section>
       )}
-    </section>
+    </main>
   );
 };

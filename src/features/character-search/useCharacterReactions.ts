@@ -15,25 +15,30 @@ export function useCharacterReactions() {
     const controller = new AbortController();
     setFetchStatus('loading');
 
-    getReactions(controller.signal)
-      .then((response) => {
-        setReactionsByCharacterId(
-          groupActiveReactionsByCharacterId(response.reactions),
-        );
-        setFetchStatus('success');
-      })
-      .catch((error: unknown) => {
-        const searchError = toSearchError(error);
-        if (searchError.code === 'request_aborted') {
-          return;
-        }
-        // Reaction enrichment failing is independent of the search itself:
-        // cards still render, they just report their own reaction failure.
-        setReactionsByCharacterId({});
-        setFetchStatus('error');
-      });
+    // Defer by a tick so StrictMode's dev-only double mount doesn't fire a
+    // real request that immediately gets aborted (avoids a console error).
+    const timeoutId = window.setTimeout(() => {
+      getReactions(controller.signal)
+        .then((response) => {
+          setReactionsByCharacterId(
+            groupActiveReactionsByCharacterId(response.reactions),
+          );
+          setFetchStatus('success');
+        })
+        .catch((error: unknown) => {
+          const searchError = toSearchError(error);
+          if (searchError.code === 'request_aborted') {
+            return;
+          }
+          // Reaction enrichment failing is independent of the search itself:
+          // cards still render, they just report their own reaction failure.
+          setReactionsByCharacterId({});
+          setFetchStatus('error');
+        });
+    }, 0);
 
     return () => {
+      window.clearTimeout(timeoutId);
       controller.abort();
     };
   }, []);

@@ -25,7 +25,7 @@
     "test:e2e:debug": "playwright test --debug"
   },
   "engines": {
-    "node": "20.11.1",
+    "node": ">=20.19.0",
     "npm": ">= 6.13.6",
     "yarn": ">= 3.4.1"
   },

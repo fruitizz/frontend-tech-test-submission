@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw';
+import { nameStartsWithQuery } from '../lib/search';
 import { allCharacters, allReactions } from './data';
 export const handlers = [
   http.get('/api/characters', ({ request }) => {
@@ -8,9 +9,10 @@ export const handlers = [
     const limitParam = url.searchParams.get('limit');
     let filteredData = allCharacters;
     if (searchName) {
-      const lowerSearchName = searchName.toLowerCase();
+      // Brief requires results whose name starts with the typed text, not
+      // an anywhere-in-string match.
       filteredData = allCharacters.filter(character =>
-        character.name.toLowerCase().includes(lowerSearchName)
+        nameStartsWithQuery(character.name, searchName)
       );
     }
 

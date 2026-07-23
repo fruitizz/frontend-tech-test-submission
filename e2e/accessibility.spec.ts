@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test';
 
-import { characterLuke } from './fixtures';
+import { charactersResponse, characterLuke } from './fixtures';
 import {
   expectCharacterVisible,
+  fulfillJson,
   gotoApp,
   mockCharacters,
   submitSearch,
@@ -11,6 +12,28 @@ import {
 } from './helpers';
 
 test.describe('accessibility', () => {
+  test('character images expose the character name as alt text', async ({
+    page,
+  }) => {
+    const lukeWithImage = { ...characterLuke, imageUrl: '/images/luke-skywalker.png' };
+
+    await mockCharacters(page, async (route) => {
+      await fulfillJson(
+        route,
+        charactersResponse([lukeWithImage], { page: 1, total: 1 }),
+      );
+    });
+    await gotoApp(page);
+    await submitSearch(page, 'sky');
+    await expectCharacterVisible(page, characterLuke);
+
+    const image = page
+      .getByRole('article')
+      .filter({ hasText: characterLuke.name })
+      .getByRole('img');
+    await expect(image).toHaveAttribute('alt', characterLuke.name);
+  });
+
   test('character cards are static articles without mouse-only div controls', async ({
     page,
   }) => {

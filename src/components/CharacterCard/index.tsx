@@ -38,7 +38,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
         <Thumbnail
           className={styles.thumbnail}
           image={imageUrl}
-          alt=""
+          alt={character.name}
           size={Size.xl}
           aspectRatio={AspectRatio.square}
           objectFit={ThumbnailObjectFit.cover}
